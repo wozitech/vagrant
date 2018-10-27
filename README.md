@@ -1,4 +1,4 @@
 # WOZiTech Limited vagrant definitions
 
-libvirt provider
-ansible provision
+* libvirt provider
+* ansible provision
