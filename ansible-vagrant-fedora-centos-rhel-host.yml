@@ -1,0 +1,30 @@
+---
+# builds vagrant/libvirt/ansible capable CentOS/RHEL/fedora host
+
+- name: Configures this host as a vagrant/libvirt/ansible drive host
+  hosts: 127.0.0.1
+  connection: local
+  become: yes
+  tasks:
+
+  - name: update the local repo
+    yum:
+      name: "*"
+      state: latest
+      #exclude: git*
+
+  - name: install the 'Development tools' package group
+    yum:
+      name: "@Development tools"
+      state: present
+
+  - name: Install vagrant
+    yum:
+      name: "{{ packages }}"
+      state: latest
+    vars:
+      packages:
+      - "@vagrant"
+      - vagrant-libvirt
+
+# note - install of the vargant-libvirt package installs the plugin to vagrant too
