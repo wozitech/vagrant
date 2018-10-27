@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - name: EPEL package manager
+      sudo: yes
+      yum: pkg=epel-release
+    - name: Install nginx
+      sudo: yes
+      yum: pkg=nginx

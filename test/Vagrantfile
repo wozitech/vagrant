@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
+
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "centos/7"
+  config.vm.provider :libvirt do |libvirt,override|
+    libvirt.host = "192.168.1.12"
+    libvirt.connect_via_ssh = true
+    libvirt.username = "aylingw"
+    #libvirt.password - leave blank, because using SSH to login with private key
+    #libvirt.id_ssh_key_file - leave blank which assumes the default ${HOME}/.ssh/id_rsa
+    libvirt.cpus = 1
+    libvirt.memory = 1024
+    libvirt.machine_virtual_size = 8
+    libvirt.autostart = true
+    #libvirt.mgmt_attach = false
+    #override.ssh.proxy_command = "ssh server -l vagrant nc -q0 %h %p"
+  end
+
+  config.vm.define :test_vm do |test_vm|
+    test_vm.vm.box = "centos/7"
+    #test.vm.hostname = "test.wozitech.local"
+    test_vm.vm.network :private_network,
+      ip: "10.0.0.10",
+      libvirt__network_name: "DMZ",
+      libvirt__netmask: "255.255.255.0",
+      nictype: "virtio",
+      libvirt__domain_name: "wozitech.local"
+
+    test_vm.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      #domain.storage :file, :size => "20G", :type => "qcow2"
+    end
+
+    test_vm.vm.provision "ansible" do |ansible|
+       ansible.playbook = "playbook.yml"
+    end
+  end
+end
