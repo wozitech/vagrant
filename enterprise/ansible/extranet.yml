@@ -3,8 +3,8 @@
   vars_files:
     - vars.yml
   vars:
-    nodejs_version: "v8.11"
-    #nodejs_version: "v10.13"
+    nodejs_version: "v8.11.4"
+    #nodejs_version: "v10.13.0"
     nvm_parent_path: /opt
     nvm_install_path: "{{ nvm_parent_path }}/nvm"
     nvm_exe_path: "{{ nvm_install_path }}/nvm.sh"
@@ -64,33 +64,37 @@
       with_items:
         - check-nodejs-version.sh
         - install-nodejs.sh
+      changed_when: false         # TODO always reporting changed on every run; find out why.
 
-    - name: Fix Windows line endings
+    - name: Fix Windows line endings - we don't care if this reports any change
       become: true
       command: dos2unix "{{item}}"
       with_items:
         - /opt/check-nodejs-version.sh
         - /opt/install-nodejs.sh
         - /etc/profile.d/allow-nvm-for-all-nvm.sh
+      changed_when: false
 
     - name: query installed Node.js versions
       become: true
       shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
       register: nodejs_info
+      changed_when: false
 
     - name: Current node.js version
       debug:
-        var: nodejs_info.stdout
+        msg: "Current Node runtime: {{ (nodejs_info.stdout|from_json).version.current }}. Target node runtime: {{ nodejs_version }}"
 
     - name: apply nvm.sh and set default version
       become: true
       shell: LC_ALL="en_US.UTF-8"  /opt/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
-      when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.default != nodejs_version
+      when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.current != nodejs_version
 
     - name: query installed Node.js versions after applying nvm
       become: true
       shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
       register: nodejs_info
+      changed_when: false
 
     - name: Current node.js version
       debug:
