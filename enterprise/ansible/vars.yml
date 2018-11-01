@@ -7,6 +7,6 @@ root_domain: "wozitech-ltd.local"
 dns: "192.168.1.1"          # subject to change
 
 default_packages:
-  - { name: epel-release, state: present }
-  - { name: net-tools, state: present }
-  - { name: dos2unix, state: present }
+  - { name: epel-release, state: latest }
+  - { name: net-tools, state: latest }
+  - { name: dos2unix, state: latest }

@@ -21,57 +21,57 @@
         - os_update is defined
         - os_update == 1
 
-    # - name: Install default packages
-    #   become: true
-    #   yum:
-    #     name: "{{ item.name }}"
-    #     state: "{{ item.state }}"
-    #   with_items:
-    #     - "{{ default_packages }}"
-    #   when: ansible_pkg_mgr == "yum"
+    - name: Install default packages
+      become: true
+      yum:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+      with_items:
+        - "{{ default_packages }}"
+      when: ansible_pkg_mgr == "yum"
 
-    # - name: Install yum Dependencies
-    #   become: true
-    #   yum:
-    #     name: "{{ item.name }}"
-    #     state: "{{ item.state }}"
-    #   with_items:
-    #     - { name: git, state: present }
-    #     - { name: gcc, state: present }
-    #     - { name: gcc-c++, state: present }
-    #     - { name: make, state: present }
-    #     - { name: openssl-devel, state: present }
-    #     - { name: libselinux-python, state: present }
-    #   when: ansible_pkg_mgr == "yum"
+    - name: Install yum Dependencies
+      become: true
+      yum:
+        name: "{{ item.name }}"
+        state: "{{ item.state }}"
+      with_items:
+        - { name: git, state: latest }
+        - { name: gcc, state: latest }
+        - { name: gcc-c++, state: latest }
+        - { name: make, state: latest }
+        - { name: openssl-devel, state: latest }
+        - { name: libselinux-python, state: latest }
+      when: ansible_pkg_mgr == "yum"
 
-    # - name: Install apt Dependencies
-    #   become: true
-    #   apt:
-    #     name: [u'git', u'curl', u'build-essential', u'libssl-dev']
-    #   when: ansible_pkg_mgr == "apt"
+    - name: Install apt Dependencies
+      become: true
+      apt:
+        name: [u'git', u'curl', u'build-essential', u'libssl-dev']
+      when: ansible_pkg_mgr == "apt"
 
-    # - name: install NVM (Node Version Manager)
-    #   become: true
-    #   git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
+    - name: install NVM (Node Version Manager)
+      become: true
+      git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
 
-    # - name: allow NVM for all users
-    #   become: true
-    #   template: src=files/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
+    - name: allow NVM for all users
+      become: true
+      template: src=files/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
 
-    # - name: copy scripts to server
-    #   become: true
-    #   copy: src="files/{{ item }}"  dest="/opt/"  mode="a+x"
-    #   with_items:
-    #     - check-nodejs-version.sh
-    #     - install-nodejs.sh
+    - name: copy scripts to server
+      become: true
+      copy: src="files/{{ item }}"  dest="/opt/"  mode="a+x"
+      with_items:
+        - check-nodejs-version.sh
+        - install-nodejs.sh
 
-    # - name: Fix Windows line endings
-    #   become: true
-    #   command: dos2unix "{{item}}"
-    #   with_items:
-    #     - /opt/check-nodejs-version.sh
-    #     - /opt/install-nodejs.sh
-    #     - /etc/profile.d/allow-nvm-for-all-nvm.sh
+    - name: Fix Windows line endings
+      become: true
+      command: dos2unix "{{item}}"
+      with_items:
+        - /opt/check-nodejs-version.sh
+        - /opt/install-nodejs.sh
+        - /etc/profile.d/allow-nvm-for-all-nvm.sh
 
     - name: query installed Node.js versions
       become: true
