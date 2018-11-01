@@ -2,17 +2,13 @@
 - hosts: all
   vars_files:
     - vars.yml
+
   vars:
     nodejs_version: "v8.11.4"
     #nodejs_version: "v10.13.0"
     nvm_parent_path: /opt
     nvm_install_path: "{{ nvm_parent_path }}/nvm"
     nvm_exe_path: "{{ nvm_install_path }}/nvm.sh"
-    nmcli_ethernet:
-      - conn_name: eth1
-        ifname: eth1
-        ip: "{{ webserver_ip }}"
-        gw: "{{ network_gw }}"
 
   tasks:
     - import_tasks: commonTasks.yml
@@ -36,7 +32,7 @@
 
     - name: Setup local network
       become: true
-      template: src=templates/ifcfg.j2 dest=//etc/sysconfig/network-scripts/ifcfg-eth1
+      template: src=templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1
       vars:
         ipinterface:
           ifname: eth1
@@ -62,8 +58,8 @@
 
     - name: Set fully qualified hostname
       become: true
-      shell: hostnamectl set-hostname "{{ webserver_hostname }}.{{ root_domain }}"
-      when: this_hostname != "webserver_hostname.root_domain"
+      shell: hostnamectl set-hostname "{{ webserver_fqdn }}"
+      when: this_hostname.stdout != webserver_fqdn
     - name: Get fully qualified hostname
       become: true
       shell: hostname
