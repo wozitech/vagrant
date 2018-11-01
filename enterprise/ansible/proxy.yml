@@ -5,6 +5,45 @@
   tasks:
     - import_tasks: commonTasks.yml
 
+    - name: Setup local network
+      become: true
+      template: src=templates/ifcfg.j2 dest=//etc/sysconfig/network-scripts/ifcfg-eth1
+      vars:
+        ipinterface:
+          ifname: eth1
+          ip: "{{ forward_proxy_ip }}"
+          gateway: "{{ network_gw }}"
+          dns: "{{ root_dns }}"
+          netmask: "{{ netmask }}"
+      register: eth1_config
+
+    - name: Restart networking
+      become: true
+      service: name=network state=restarted
+      when: eth1_config.changed
+      
+    - name: Get fully qualified hostname
+      become: true
+      shell: hostname
+      register: this_hostname
+      changed_when: false
+    - name: Current hostname
+      debug:
+        msg: "Current hostname: {{ this_hostname.stdout }}"
+
+    - name: Set fully qualified hostname
+      become: true
+      shell: hostnamectl set-hostname "{{ proxy_hostname }}.{{ root_domain }}"
+      when: this_hostname != "webserver_hostname.root_domain"
+    - name: Get fully qualified hostname
+      become: true
+      shell: hostname
+      register: this_hostname
+      changed_when: false
+    - name: New hostname
+      debug:
+        msg: "New hostname: {{ this_hostname.stdout }}"
+
     - name: Install nginx (reverse)
       become: true
       yum:

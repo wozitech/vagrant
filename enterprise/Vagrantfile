@@ -34,6 +34,8 @@ Vagrant.configure("2") do |config|
 
     proxy.vm.provision "ansible" do |ansible|
        ansible.playbook = "ansible/proxy.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
     end
 
     proxy.vm.post_up_message = "The proxy server is up and running; port 8080 and 8443 inbound (reverse) and port 80 outbound (forward)"

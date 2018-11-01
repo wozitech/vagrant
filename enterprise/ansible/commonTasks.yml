@@ -21,4 +21,5 @@
   when:
     - ansible_pkg_mgr == "yum"
     - build_stage is defined
+    - build_stage is search("1")
 
