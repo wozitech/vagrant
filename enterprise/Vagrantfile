@@ -1,0 +1,59 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# wit home Enterprise virtual (KVM) servers:
+# 1. Proxy (forward and reverse)
+# 2. Extranet web server (wiki)
+
+Vagrant.configure("2") do |config|
+   
+  config.vm.box = "centos/7"
+  config.vm.synced_folder "./", "/vagrant", type: "nfs"
+
+  config.vm.provider :libvirt do |libvirt,override|
+    libvirt.host = "192.168.1.12"
+    libvirt.connect_via_ssh = true
+    libvirt.username = "aylingw"
+    #libvirt.password - leave blank, because using SSH to login with private key
+    #libvirt.id_ssh_key_file - leave blank which assumes the default ${HOME}/.ssh/id_rsa
+    libvirt.cpus = 1
+    libvirt.memory = 1024
+    libvirt.autostart = true
+    #libvirt.mgmt_attach = false
+  end
+
+  config.vm.define :proxy do |proxy|
+    proxy.vm.hostname = "proxy.wozitech.local"
+    proxy.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    proxy.vm.provider :libvirt do |domain|
+      #domain.memory = 2048
+      #domain.storage :file, :size => "20G", :type => "qcow2"
+    end
+
+    proxy.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/proxy.yml"
+    end
+
+    proxy.vm.post_up_message = "The proxy server is up and running; port 8080 and 8443 inbound (reverse) and port 80 outbound (forward)"
+  end
+
+  config.vm.define :web1 do |web|
+    web.vm.hostname = "web1.wozitech.local"
+    web.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    web.vm.provider :libvirt do |domain|
+      #domain.memory = 2048
+      #domain.storage :file, :size => "20G", :type => "qcow2"
+    end
+
+    web.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/extranet.yml"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    web.vm.post_up_message = "The Extranet web server is up and running; port 8080"
+  end
+end
