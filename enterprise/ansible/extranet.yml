@@ -8,27 +8,14 @@
     nvm_parent_path: /opt
     nvm_install_path: "{{ nvm_parent_path }}/nvm"
     nvm_exe_path: "{{ nvm_install_path }}/nvm.sh"
+    nmcli_ethernet:
+      - conn_name: eth1
+        ifname: eth1
+        ip: "{{ webserver_ip }}"
+        gw: "{{ network_gw }}"
 
   tasks:
-    - name: update the local repo
-      become: true
-      yum:
-        name: "*"
-        state: latest
-        #exclude: git*
-      when:
-        - ansible_pkg_mgr == "yum"
-        - os_update is defined
-        - os_update == 1
-
-    - name: Install default packages
-      become: true
-      yum:
-        name: "{{ item.name }}"
-        state: "{{ item.state }}"
-      with_items:
-        - "{{ default_packages }}"
-      when: ansible_pkg_mgr == "yum"
+    - import_tasks: commonTasks.yml
 
     - name: Install yum Dependencies
       become: true
@@ -42,60 +29,97 @@
         - { name: make, state: latest }
         - { name: openssl-devel, state: latest }
         - { name: libselinux-python, state: latest }
-      when: ansible_pkg_mgr == "yum"
+      when:
+        - ansible_pkg_mgr == "yum"
+        - build_stage is defined
+        - build_stage is search("1")
 
-    - name: Install apt Dependencies
+    - name: Setup local network
       become: true
-      apt:
-        name: [u'git', u'curl', u'build-essential', u'libssl-dev']
-      when: ansible_pkg_mgr == "apt"
+      template: src=templates/ifcfg.j2 dest=//etc/sysconfig/network-scripts/ifcfg-eth1
+      vars:
+        ipinterface:
+          ifname: eth1
+          ip: "{{ webserver_ip }}"
+          gateway: "{{ network_gw }}"
+          dns: "{{ root_dns }}"
+          netmask: "{{ netmask }}"
+      register: eth1_config
 
-    - name: install NVM (Node Version Manager)
+    - name: Restart networking
       become: true
-      git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
-
-    - name: allow NVM for all users
+      service: name=network state=restarted
+      when: eth1_config.changed
+      
+    - name: Get fully qualified hostname
       become: true
-      template: src=files/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
-
-    - name: copy scripts to server
-      become: true
-      copy: src="files/{{ item }}"  dest="/opt/"  mode="a+x"
-      with_items:
-        - check-nodejs-version.sh
-        - install-nodejs.sh
-      changed_when: false         # TODO always reporting changed on every run; find out why.
-
-    - name: Fix Windows line endings - we don't care if this reports any change
-      become: true
-      command: dos2unix "{{item}}"
-      with_items:
-        - /opt/check-nodejs-version.sh
-        - /opt/install-nodejs.sh
-        - /etc/profile.d/allow-nvm-for-all-nvm.sh
+      shell: hostname
+      register: this_hostname
       changed_when: false
-
-    - name: query installed Node.js versions
-      become: true
-      shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
-      register: nodejs_info
-      changed_when: false
-
-    - name: Current node.js version
+    - name: Current hostname
       debug:
-        msg: "Current Node runtime: {{ (nodejs_info.stdout|from_json).version.current }}. Target node runtime: {{ nodejs_version }}"
+        msg: "Current hostname: {{ this_hostname.stdout }}"
 
-    - name: apply nvm.sh and set default version
+    - name: Set fully qualified hostname
       become: true
-      shell: LC_ALL="en_US.UTF-8"  /opt/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
-      when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.current != nodejs_version
-
-    - name: query installed Node.js versions after applying nvm
+      shell: hostnamectl set-hostname "{{ webserver_hostname }}.{{ root_domain }}"
+      when: this_hostname != "webserver_hostname.root_domain"
+    - name: Get fully qualified hostname
       become: true
-      shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
-      register: nodejs_info
+      shell: hostname
+      register: this_hostname
       changed_when: false
-
-    - name: Current node.js version
+    - name: New hostname
       debug:
-        msg: "Node runtime: {{ (nodejs_info.stdout|from_json).version.default }}"
+        msg: "New hostname: {{ this_hostname.stdout }}"
+
+
+    # - name: install NVM (Node Version Manager)
+    #   become: true
+    #   git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
+
+    # - name: allow NVM for all users
+    #   become: true
+    #   template: src=files/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
+
+    # - name: copy scripts to server
+    #   become: true
+    #   copy: src="files/{{ item }}"  dest="/opt/"  mode="a+x"
+    #   with_items:
+    #     - check-nodejs-version.sh
+    #     - install-nodejs.sh
+    #   changed_when: false         # TODO always reporting changed on every run; find out why.
+
+    # - name: Fix Windows line endings - we don't care if this reports any change
+    #   become: true
+    #   command: dos2unix "{{item}}"
+    #   with_items:
+    #     - /opt/check-nodejs-version.sh
+    #     - /opt/install-nodejs.sh
+    #     - /etc/profile.d/allow-nvm-for-all-nvm.sh
+    #   changed_when: false
+
+    # - name: query installed Node.js versions
+    #   become: true
+    #   shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
+    #   register: nodejs_info
+    #   changed_when: false
+
+    # - name: Current node.js version
+    #   debug:
+    #     msg: "Current Node runtime: {{ (nodejs_info.stdout|from_json).version.current }}. Target node runtime: {{ nodejs_version }}"
+
+    # - name: apply nvm.sh and set default version
+    #   become: true
+    #   shell: LC_ALL="en_US.UTF-8"  /opt/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
+    #   when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.current != nodejs_version
+
+    # - name: query installed Node.js versions after applying nvm
+    #   become: true
+    #   shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
+    #   register: nodejs_info
+    #   changed_when: false
+
+    # - name: Current node.js version
+    #   debug:
+    #     msg: "Node runtime: {{ (nodejs_info.stdout|from_json).version.default }}"

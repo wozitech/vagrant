@@ -1,0 +1,18 @@
+# configured via ansible
+BOOTPROTO=static
+DEVICE="{{ ipinterface.ifname }}"
+ONBOOT=yes
+TYPE=Ethernet
+IPADDR="{{ ipinterface.ip }}"
+NETMASK="{{ ipinterface.netmask }}" 
+GATEWAY="{{ ipinterface.gateway }}" 
+DEFROUTE=yes
+PEERDNS=yes
+DNS1="{{ ipinterface.dns }}"
+PEERROUTES=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=no
+NAME="{{ ipinterface.ifname }}"
+PROXY_METHOD=none
+BROWSER_ONLY=no
+#UUID=b0b73287-7783-4eb5-b467-0df46d2a323f

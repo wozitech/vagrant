@@ -3,25 +3,7 @@
   vars_files:
     - vars.yml
   tasks:
-    - name: update the local repo
-      become: true
-      yum:
-        name: "*"
-        state: latest
-        #exclude: git*
-      when:
-        - ansible_pkg_mgr == "yum"
-        - os_update is defined
-        - os_update == 1
-        
-    - name: Install default packages
-      become: true
-      yum:
-        name: "{{ item.name }}"
-        state: "{{ item.state }}"
-      with_items:
-        - "{{ default_packages }}"
-      when: ansible_pkg_mgr == "yum"
+    - import_tasks: commonTasks.yml
 
     - name: Install nginx (reverse)
       become: true

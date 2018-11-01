@@ -1,12 +1,21 @@
 network_gw: "10.0.0.2"      # gateway firewall
 netmask: "255.255.255.0"
-webserver_ip: "10.0.0.20"
-proxy_ip: "10.0.0.10"
+webserver_ip: "10.0.0.21"
+forward_proxy_ip: "10.0.0.10"
+reverse_proxy_ip: "10.0.0.11"
 root_domain: "wozitech-ltd.local"
+proxy_hostname: "proxy"
+webserver_hostname: "web1"
 
-dns: "192.168.1.1"          # subject to change
+root_dns: "192.168.1.1"          # subject to change
 
 default_packages:
   - { name: epel-release, state: latest }
   - { name: net-tools, state: latest }
+  - { name: bind-utils, state: latest }
   - { name: dos2unix, state: latest }
+  - { name: NetworkManager-glib, state: latest }
+  - { name: libnm-gtk-devel.x86_64, state: latest }
+  - { name: nm-connection-editor.x86_64, state: latest }
+  - { name: libsemanage-python, state: latest }
+  - { name: policycoreutils-python, state: latest }
