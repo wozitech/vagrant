@@ -1,12 +1,12 @@
 ---
 - hosts: all
   vars_files:
-    - ../../common/ansible/vars/centosVars.yml
-    - vars.yml
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
 
   tasks:
-    - import_tasks: ../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: tasks/proxy-network.yml
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    - import_tasks: tasks/network.yml
 
     - name: Install nginx (reverse)
       become: true

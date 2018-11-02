@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     end
 
     proxy.vm.provision "ansible" do |ansible|
-       ansible.playbook = "ansible/proxy.yml"
+       ansible.playbook = "ansible/hosts/proxy/proxy.yml"
        ansible.compatibility_mode = "2.0"
        ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
     end
@@ -52,7 +52,7 @@ Vagrant.configure("2") do |config|
     end
 
     web.vm.provision "ansible" do |ansible|
-       ansible.playbook = "ansible/extranet.yml"
+       ansible.playbook = "ansible/hosts/extranet/extranet.yml"
        ansible.compatibility_mode = "2.0"
        ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
     end
