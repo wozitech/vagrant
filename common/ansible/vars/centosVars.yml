@@ -11,3 +11,4 @@ default_os_packages:
   - { name: openssl-devel, state: latest }
   - { name: libselinux-python, state: latest }
   - { name: traceroute, state: latest }
+  - { name: tcpdump, state: absent }

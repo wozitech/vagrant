@@ -1,0 +1,55 @@
+# wiki.js native tasks - https://docs.requarks.io/wiki
+# TODO:
+# 1. Add specific user and group for wikijs to run under
+---
+- name: Install specific yum Dependencies (git upgrade to V2)
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    #disablerepo: "base,updates"
+    #enablerepo: "rpmforge-extras"
+  with_items:
+    - { name: centos-release-scl, state: latest }
+    - { name: sclo-git212.x86_64, state: latest }
+  when:
+    - ansible_pkg_mgr == "yum"
+
+- name: allow git2 for all users
+  become: true
+  copy:
+    content: source scl_source enable sclo-git212
+    dest: /etc/profile.d/git2.sh
+    owner: root
+    group: root
+    mode: 755
+
+# wiki.js is a node application which requires running a wizard on first install; it generates a config.yml file.
+- name: create wikijs parent installation directory
+  become: true
+  file:
+    path: "{{ wikijs_parent_path }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+# separate create tasks to allow for a dedicated uid/gid for wikijs
+- name: create wikijs installation directory
+  become: true
+  file:
+    path: "{{ wikijs_path }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+- name: install wiki.js
+  become: true
+  shell: /bin/curl -sSo- https://wiki.js.org/install.sh | /bin/bash
+  args:
+    chdir: "{{ wikijs_path }}"
+    creates: "{{ wikijs_path }}/config.yml"
+  register: wikijs_install
+  changed_when: false
+
