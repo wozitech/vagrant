@@ -1,62 +1,12 @@
 ---
 - hosts: all
   vars_files:
+    - ../../common/ansible/vars/centosVars.yml
     - vars.yml
 
   tasks:
     - import_tasks: ../../common/ansible/tasks/centosTasks.yml
-
-    - name: Setup local network (eth1)
-      become: true
-      template: src=../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1
-      vars:
-        ipinterface:
-          ifname: eth1
-          ip: "{{ forward_proxy_ip }}"
-          ip1: "{{ reverse_proxy_ip }}"
-          gateway: "{{ network_gw }}"
-          dns: "{{ root_dns }}"
-          netmask: "{{ netmask }}"
-      register: eth1_config
-
-    - name: Setup local network (eth1:0)
-      become: true
-      template: src=../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1:0
-      vars:
-        ipinterface:
-          ifname: eth1:0
-          ip: "{{ reverse_proxy_ip }}"
-          gateway: "{{ network_gw }}"
-          dns: "{{ root_dns }}"
-          netmask: "{{ netmask }}"
-      register: eth11_config
-
-    - name: Restart networking
-      become: true
-      service: name=network state=restarted
-      when: eth1_config.changed or eth11_config.changed
-      
-    - name: Get fully qualified hostname
-      become: true
-      shell: hostname
-      register: this_hostname
-      changed_when: false
-    - name: Current hostname
-      debug:
-        msg: "Current hostname: {{ this_hostname.stdout }}"
-
-    - name: Set fully qualified hostname
-      become: true
-      shell: hostnamectl set-hostname "{{ proxy_fqdn }}"
-      when: this_hostname.stdout != proxy_fqdn
-    - name: Get fully qualified hostname
-      become: true
-      shell: hostname
-      register: this_hostname
-      changed_when: false
-    - name: New hostname
-      debug:
-        msg: "New hostname: {{ this_hostname.stdout }}"
+    - import_tasks: tasks/proxy-network.yml
 
     - name: Install nginx (reverse)
       become: true

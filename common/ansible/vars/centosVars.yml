@@ -1,0 +1,13 @@
+default_os_packages:
+  - { name: epel-release, state: latest }
+  - { name: net-tools, state: latest }
+  - { name: bind-utils, state: latest }
+  - { name: dos2unix, state: latest }
+  - { name: NetworkManager-glib, state: latest }
+  - { name: libnm-gtk-devel.x86_64, state: latest }
+  - { name: nm-connection-editor.x86_64, state: latest }
+  - { name: libsemanage-python, state: latest }
+  - { name: policycoreutils-python, state: latest }
+  - { name: openssl-devel, state: latest }
+  - { name: libselinux-python, state: latest }
+  - { name: traceroute, state: latest }
