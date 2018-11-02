@@ -11,7 +11,7 @@
     nvm_exe_path: "{{ nvm_install_path }}/nvm.sh"
 
   tasks:
-    - import_tasks: commonTasks.yml
+    - import_tasks: ../../common/ansible/tasks/centosTasks.yml
 
     - name: Install yum Dependencies
       become: true
@@ -32,7 +32,7 @@
 
     - name: Setup local network
       become: true
-      template: src=templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1
+      template: src=../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1
       vars:
         ipinterface:
           ifname: eth1
