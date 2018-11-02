@@ -12,6 +12,7 @@
     nvm_exe_path: "{{ nvm_install_path }}/nvm.sh"
 
   tasks:
-    - import_tasks: ../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: tasks/extranet-network.yml
-    - import_tasks: tasks/node-native.yml
+    # - import_tasks: ../../common/ansible/tasks/centosTasks.yml
+    # - import_tasks: tasks/extranet-network.yml
+    # - import_tasks: tasks/node-native.yml
+    - import_tasks: tasks/mongodb-simple-local.yml
