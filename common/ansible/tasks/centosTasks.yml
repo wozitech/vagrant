@@ -23,3 +23,43 @@
     - build_stage is defined
     - build_stage is search("1")
 
+- name: Default groups
+  become: true
+  group:
+    name: "{{ item.groupname }}"
+    gid: "{{ item.gid }}"
+    state: present
+  with_items:
+    - "{{ default_groups }}"
+  when:
+    - build_stage is defined
+    - build_stage is search("2")
+
+- name: Default users
+  become: true
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    uid: "{{ item.uid }}"
+    group: "{{ item.default_group }}"
+    groups: "{{ item.groups }}"
+    create_home: yes
+    append: no
+    generate_ssh_key: yes
+    state: present
+  with_items:
+    - "{{ default_users }}"
+  when:
+    - build_stage is defined
+    - build_stage is search("2")
+
+# could add wit-admin to sudo's, but it's just as easy to use existing wheel; but we want to use NOPASSWD
+- name: sudoers "wit-admin" group - NOPASSWD
+  become: true
+  copy:
+    content: "%wit-admin ALL=(ALL) NOPASSWD: ALL\n"
+    dest: /etc/sudoers.d/wit-admin
+    owner: root
+    group: root
+    mode: 0600
+    validate: "/usr/sbin/visudo -cf %s"

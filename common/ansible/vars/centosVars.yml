@@ -13,3 +13,9 @@ default_os_packages:
   - { name: traceroute, state: latest }
   - { name: tcpdump, state: absent }
   - { name: telnet, state: absent }
+
+default_groups:
+  - { groupname: wit-admin, gid: 2000 }
+
+default_users:
+  - { username: aylingw, uid: 2001, default_group: wit-admin, groups: 'wit-admin' }
