@@ -12,3 +12,4 @@ default_os_packages:
   - { name: libselinux-python, state: latest }
   - { name: traceroute, state: latest }
   - { name: tcpdump, state: absent }
+  - { name: telnet, state: absent }
