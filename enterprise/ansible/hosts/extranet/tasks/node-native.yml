@@ -21,7 +21,7 @@
 
 - name: allow NVM for all users
   become: true
-  template: src=../files/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
+  template: src=../templates/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
 
 - name: copy scripts to server
   become: true
