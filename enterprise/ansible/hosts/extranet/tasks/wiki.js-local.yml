@@ -1,6 +1,10 @@
-# wiki.js native tasks - https://docs.requarks.io/wiki
+# wiki.js native tasks - https://docs.requarks.io/wiki | https://docs.requarks.io/wiki/install/installation
 # TODO:
-# 1. Add specific user and group for wikijs to run under
+# 1. tidy up the open permissions on files in the installation directory; recursive mode
+# 2. Download wikijs private/public key from vault.
+# 3. Restore MongoDB from latest backup
+# 4. Backup MongoDB
+# 5. Start/Stop/ensure running wikis
 ---
 # - name: Install specific yum Dependencies (git upgrade to V2)
 #   become: true
@@ -22,6 +26,27 @@
 #     group: root
 #     mode: 755
 
+- name: wikijs group
+  become: true
+  group:
+    name: wikijs
+    gid: 10000
+    state: present
+
+- name: wikijs user
+  become: true
+  user:
+    name: wikijs
+    shell: /bin/bash
+    uid: 10000
+    group: wikijs
+    home: "{{ wikijs_path }}"
+    #groups: "{{ item.groups }}"
+    create_home: no
+    append: no
+    generate_ssh_key: no
+    state: present
+
 # wiki.js is a node application which requires running a wizard on first install; it generates a config.yml file.
 - name: create wikijs parent installation directory
   become: true
@@ -38,15 +63,51 @@
   file:
     path: "{{ wikijs_path }}"
     state: directory
-    mode: 0755
-    owner: root
-    group: root
+    mode: 0700
+    owner: wikijs
+    group: wikijs
 
 - name: install wiki.js
   become: true
+  become_user: wikijs
   shell: /bin/curl -sSo- https://wiki.js.org/install.sh | /bin/bash
   args:
     chdir: "{{ wikijs_path }}"
     creates: "{{ wikijs_check_file }}"
+    warn: false
   register: wikijs_install
 
+- name: create wikijs key directory
+  become: true
+  file:
+    path: /etc/wikijs/keys
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+- name: Generate private/public key
+  become: true
+  shell: /bin/ssh-keygen -f "{{ wikijs_github_key }}" -t ecdsa -b 521 -q -N ""
+  args:
+    creates: "{{ wikijs_github_public_key }}"
+- name: Must upload public key
+  debug:
+    msg: "Must upload {{ wikijs_github_public_key }} under 'Settings -> Deploy Keys' against {{ wikijs_github_repo }}"
+
+- name: Customise wikijs config.yml
+  become: true
+  become_user: wikijs
+  template: src=../templates/wikijs_config.yml.j2 dest="{{ wikijs_path }}/config.yml"
+  vars:
+    wikijs_cfg:
+      title: "{{ wikijs_title }}"
+      port: "{{ wikijs_port }}"
+      mongodb_uri: "{{ wikijs_mongodb_uri }}"
+      github_key: "{{ wikijs_github_key }}"
+      server_email: "{{ wikijs_serverEmail }}"
+      github_repo: "{{ wikijs_github_repo }}"
+  register: eth1_config
+
+# host CentOS firewalls
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
+# https://github.com/plone/ansible-playbook/blob/master/firewalls/centos-firewalld.yml
