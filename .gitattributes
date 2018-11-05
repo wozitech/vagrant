@@ -1,1 +1,2 @@
 enterprise/ansible/hosts/extranet/files/wikijs_config.yml.j2 eol=lf
+enterprise/ansible/hosts/extranet/files/wikijs.service.j2 eol-lf
