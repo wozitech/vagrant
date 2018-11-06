@@ -1,2 +1,3 @@
-enterprise/ansible/hosts/extranet/files/wikijs_config.yml.j2 eol=lf
-enterprise/ansible/hosts/extranet/files/wikijs.service.j2 eol-lf
+enterprise/ansible/hosts/extranet/templates/wikijs_config.yml.j2 eol=lf
+enterprise/ansible/hosts/extranet/templates/wikijs.service.j2 eol-lf
+enterprise/ansible/hosts/extranet/templates/wikijs.service.shj2 eol-lf

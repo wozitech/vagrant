@@ -1,4 +1,6 @@
 # wiki.js specific vars
+wikijs_user: wikijs
+wikijs_group: wikijs
 wikijs_parent_path: /var/www/nodejs
 wikijs_path: "{{ wikijs_parent_path }}/wikijs"
 wikijs_check_file: "{{ wikijs_path }}/wiki.js"

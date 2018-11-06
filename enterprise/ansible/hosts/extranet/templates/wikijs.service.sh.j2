@@ -1,0 +1,20 @@
+#!/bin/bash
+# used to start/stop wikijs - from wikijs.service
+#  a workaround to avoid the absolute paths required on ExecStart/ExecStop
+#
+# takes one parameter - the action "START" or "STOP"
+
+# need knowledge of the nvm/node environment - systemd does not take from /etc/profile.d
+source /etc/profile.d/allow-nvm-for-all-nvm.sh
+
+NODE_EXECUTABLE=`which node`
+WIKI_PATH={{ wikijs_path }}
+
+case $1 in
+    START)
+        ${NODE_EXECUTABLE} ${WIKI_PATH}/wiki.js start
+        ;;
+    STOP)
+        ${NODE_EXECUTABLE} ${WIKI_PATH}/wiki.js stop
+        ;;
+esac

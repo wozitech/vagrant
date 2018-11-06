@@ -1,10 +1,11 @@
 # wiki.js native tasks - https://docs.requarks.io/wiki | https://docs.requarks.io/wiki/install/installation
 # TODO:
-# 1. tidy up the open permissions on files in the installation directory; recursive mode
-# 2. Download wikijs private/public key from vault.
-# 3. Restore MongoDB from latest backup
-# 4. Backup MongoDB
+# 1. tidy up the open permissions on files in the installation directory; recursive mode - https://github.com/wozitech/vagrant/issues/1
+# 2. Download wikijs private/public key from vault. - https://github.com/wozitech/vagrant/issues/2
+# 3. Restore MongoDB from latest backup - https://github.com/wozitech/vagrant/issues/3
+# 4. Backup MongoDB - https://github.com/wozitech/vagrant/issues/4
 # 5. Start/Stop/ensure running wikis
+# 6. With HTTPS reverse proxy: https://docs.requarks.io/wiki/administration/setup-nginx-reverse-proxy
 ---
 # - name: Install specific yum Dependencies (git upgrade to V2)
 #   become: true
@@ -29,17 +30,17 @@
 - name: wikijs group
   become: true
   group:
-    name: wikijs
+    name: "{{ wikijs_group }}"
     gid: 10000
     state: present
 
 - name: wikijs user
   become: true
   user:
-    name: wikijs
+    name: "{{ wikijs_user }}"
     shell: /bin/bash
     uid: 10000
-    group: wikijs
+    group: "{{ wikijs_group }}"
     home: "{{ wikijs_path }}"
     #groups: "{{ item.groups }}"
     create_home: no
@@ -64,12 +65,12 @@
     path: "{{ wikijs_path }}"
     state: directory
     mode: 0700
-    owner: wikijs
-    group: wikijs
+    owner: "{{ wikijs_user }}"
+    group: "{{ wikijs_group }}"
 
 - name: install wiki.js
   become: true
-  become_user: wikijs
+  become_user: "{{ wikijs_user }}"
   shell: /bin/curl -sSo- https://wiki.js.org/install.sh | /bin/bash
   args:
     chdir: "{{ wikijs_path }}"
@@ -96,7 +97,7 @@
 
 - name: Customise wikijs config.yml
   become: true
-  become_user: wikijs
+  become_user: "{{ wikijs_user }}"
   template: src=../templates/wikijs_config.yml.j2 dest="{{ wikijs_path }}/config.yml"
   vars:
     wikijs_cfg:
@@ -106,7 +107,41 @@
       github_key: "{{ wikijs_github_key }}"
       server_email: "{{ wikijs_serverEmail }}"
       github_repo: "{{ wikijs_github_repo }}"
-  register: eth1_config
+
+- name: Install wikijs service
+  become: true
+  template: src=../templates/wikijs.service.j2 dest=/usr/lib/systemd/system/wikijs.service
+  vars:
+    wikijs_srv:
+      user: "{{  wikijs_user }}"
+      group: "{{  wikijs_group }}"
+      path: "{{ wikijs_path }}"
+  register: wikijs_service_install
+
+- name: Install wikijs service script
+  become: true
+  template:
+    src: ../templates/wikijs.service.sh.j2
+    dest: "/opt/wikijs.service.sh"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Enable and start wikijs
+  become: true
+  systemd:
+    name: wikijs
+    state: started
+  when: not wikijs_service_install.changed
+
+- name: Reload systemd, enable and start wikijs
+  become: true
+  systemd:
+    name: wikijs
+    state: started
+    daemon_reload: yes
+  when: wikijs_service_install.changed
+
 
 # host CentOS firewalls
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
