@@ -133,6 +133,7 @@
   systemd:
     name: wikijs
     state: started
+    enabled: true
   when: not wikijs_service_install.changed
 
 - name: Reload systemd, enable and start wikijs
@@ -140,6 +141,7 @@
   systemd:
     name: wikijs
     state: started
+    enabled: true
     daemon_reload: yes
   when: wikijs_service_install.changed
 

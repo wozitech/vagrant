@@ -63,3 +63,41 @@
     group: root
     mode: 0600
     validate: "/usr/sbin/visudo -cf %s"
+
+
+- name: firewalld zone network eth0 interface
+  become: true
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth0 regexp="^ZONE" line="ZONE=trusted"
+  register: eth0_zoned
+- name: firewalld zone network eth1 interface
+  become: true
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-eth1 regexp="^ZONE" line="ZONE=public"
+  register: eth1_zoned
+- name: Restart networking
+  become: true
+  service: name=network state=restarted
+  when: eth0_zoned.changed or eth1_zoned.changed
+
+- name: Enable firewalld
+  become: true
+  systemd:
+    name: firewalld
+    state: started
+    enabled: true
+
+- name: Enable SSH and DHCP client only on trusted zone
+  become: true
+  command: firewall-cmd --zone=trusted --permanent --add-service=ssh --add-service=dhcpv6-client
+  register: trusted_updated
+
+- name: Disable SSH/DHCP from on public zone
+  become: true
+  command: firewall-cmd --zone=public --permanent --remove-service=ssh --remove-service=dhcpv6-client
+  register: public_updated
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: trusted_updated.changed or public_updated.changed

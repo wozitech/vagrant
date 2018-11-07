@@ -11,8 +11,8 @@
     #nodejs_version: "v10.13.0"
 
   tasks:
-    # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
     # - import_tasks: tasks/network.yml
     # - import_tasks: tasks/node-native.yml
     # - import_tasks: tasks/mongodb-simple-local.yml
-    - import_tasks: tasks/wiki.js-local.yml
+    # - import_tasks: tasks/wiki.js-local.yml
