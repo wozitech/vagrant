@@ -145,6 +145,18 @@
     daemon_reload: yes
   when: wikijs_service_install.changed
 
+- name: Enable wikijs inbound on public zone
+  become: true
+  command: "firewall-cmd --zone=public --permanent --add-port={{ wikijs_port }}/tcp"
+  register: wikijs_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: wikijs_firewalld.changed
+
 
 # host CentOS firewalls
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
