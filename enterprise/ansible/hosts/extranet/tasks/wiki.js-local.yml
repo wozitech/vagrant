@@ -116,6 +116,7 @@
       user: "{{  wikijs_user }}"
       group: "{{  wikijs_group }}"
       path: "{{ wikijs_path }}"
+      pid: " {{ wikijs_pm2_pid }}"
   register: wikijs_service_install
 
 - name: Install wikijs service script

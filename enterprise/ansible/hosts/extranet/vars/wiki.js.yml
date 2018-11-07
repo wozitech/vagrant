@@ -12,3 +12,4 @@ wikijs_title: WOZiTech Limited Wiki
 wikijs_port: 3000
 wikijs_mongodb_uri: mongodb://localhost:27017/wiki
 wikijs_serverEmail: warren.ayling@wozitech-ltd.co.uk
+wikijs_pm2_pid: "{{ wikijs_path }}/.pm2/pids/wiki-0.pid"
