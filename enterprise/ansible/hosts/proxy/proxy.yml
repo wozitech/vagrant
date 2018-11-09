@@ -9,18 +9,6 @@
 
   tasks:
     - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
     - import_tasks: tasks/network.yml
 
-    - name: Install nginx (reverse)
-      become: true
-      yum:
-        name: nginx
-        state: latest
-      when: ansible_pkg_mgr == "yum"
-
-    - name: Install squid (forward)
-      become: true
-      yum:
-        name: squid
-        state: latest
-      when: ansible_pkg_mgr == "yum"
