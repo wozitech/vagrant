@@ -87,12 +87,25 @@
 
 - name: Enable SSH and DHCP client only on trusted zone
   become: true
-  command: firewall-cmd --zone=trusted --permanent --add-service=ssh --add-service=dhcpv6-client
+  firewalld:
+    state: enabled
+    zone: trusted
+    service: "{{ item }}"
+  with_items:
+    - ssh
+    - dhcpv6-client
   register: trusted_updated
 
 - name: Disable SSH/DHCP from on public zone
   become: true
-  command: firewall-cmd --zone=public --permanent --remove-service=ssh --remove-service=dhcpv6-client
+  firewalld:
+    state: disabled
+    zone: public
+    service: "{{ item }}"
+    permanent: yes
+  with_items:
+    - ssh
+    - dhcpv6-client
   register: public_updated
 
 - name: Restart firewall for changes to take effect

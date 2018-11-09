@@ -142,7 +142,11 @@
 
 - name: Enable wikijs inbound on public zone
   become: true
-  command: "firewall-cmd --zone=public --permanent --add-port={{ wikijs_port }}/tcp"
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ wikijs_port }}/tcp"
+    permanent: yes
   register: wikijs_firewalld
 
 - name: Restart firewall for changes to take effect
