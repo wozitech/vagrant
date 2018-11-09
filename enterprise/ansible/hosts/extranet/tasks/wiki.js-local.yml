@@ -1,11 +1,6 @@
 # wiki.js native tasks - https://docs.requarks.io/wiki | https://docs.requarks.io/wiki/install/installation
 # TODO:
-# 1. tidy up the open permissions on files in the installation directory; recursive mode - https://github.com/wozitech/vagrant/issues/1
-# 2. Download wikijs private/public key from vault. - https://github.com/wozitech/vagrant/issues/2
-# 3. Restore MongoDB from latest backup - https://github.com/wozitech/vagrant/issues/3
-# 4. Backup MongoDB - https://github.com/wozitech/vagrant/issues/4
-# 5. Start/Stop/ensure running wikis
-# 6. With HTTPS reverse proxy: https://docs.requarks.io/wiki/administration/setup-nginx-reverse-proxy
+# 1. With HTTPS reverse proxy: https://docs.requarks.io/wiki/administration/setup-nginx-reverse-proxy
 ---
 # - name: Install specific yum Dependencies (git upgrade to V2)
 #   become: true
@@ -156,8 +151,3 @@
     name: firewalld
     state: restarted
   when: wikijs_firewalld.changed
-
-
-# host CentOS firewalls
-# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
-# https://github.com/plone/ansible-playbook/blob/master/firewalls/centos-firewalld.yml
