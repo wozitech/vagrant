@@ -28,7 +28,7 @@
 - name: create the nginx container
   become: true
   docker_container:
-    name: nginx
+    name: "{{ NGINX_CONTAINER_NAME }}"
     image: jwilder/nginx-proxy:latest
     state: started
     detach: yes
@@ -63,3 +63,26 @@
     name: firewalld
     state: restarted
   when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
+
+
+- name: Install nginx service
+  become: true
+  template:
+      src: ../templates/nginx.docker.service.j2
+      dest: /usr/lib/systemd/system/nginx.service
+      owner: root
+      group: root
+      mode: 0644
+  vars:
+    nginx_srv:
+      name: "{{  NGINX_CONTAINER_NAME }}"
+  register: nginx_service_install
+
+- name: Enable and start nginx docker service
+  become: true
+  systemd:
+    name: "{{ NGINX_CONTAINER_NAME }}"
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: nginx_service_install.changed

@@ -13,6 +13,7 @@
     SSL_PORT: 443
     SSL_CERTS_DIR: /etc/nginx/certs
     DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
+    NGINX_CONTAINER_NAME: nginx
 
   tasks:
     # - import_tasks: tasks/network.yml
