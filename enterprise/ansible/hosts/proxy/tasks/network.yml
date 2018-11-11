@@ -1,4 +1,4 @@
-# common tasks
+# network tasks
 ---
 - name: Setup local network (eth1)
   become: true
