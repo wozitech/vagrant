@@ -9,13 +9,38 @@
     state: started
     detach: yes
     volumes:
-      - "/var/run/docker:/tmp/docker.sock:ro"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
     ports:
-      - "{{ forward_proxy_ip }}:8080:8080/tcp"
-      - "{{ forward_proxy_ip }}:8443:8443/tcp"
-    env:
-      VIRTUAL_PORT: 8080
+      - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
+      - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
+    #env:
+    #  VIRTUAL_PORT: "{{ NON_SSL_PORT }}"
 
+
+- name: Enable nginx inbound on public zone (non-ssl)
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ NON_SSL_PORT }}/tcp"
+    permanent: yes
+  register: nginx_non_ssl_firewalld
+
+- name: Enable nginx inbound on public zone (ssl)
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ SSL_PORT }}/tcp"
+    permanent: yes
+  register: nginx_ssl_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
 
 
 # /etc/nginx/dhparam/dhparam.pem

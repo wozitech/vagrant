@@ -7,6 +7,10 @@
     - ../../../../common/ansible/vars/centosVars.yml
     - ../../vars.yml
 
+  vars:
+    NON_SSL_PORT: 80
+    SSL_PORT: 433
+
   tasks:
     # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
     # - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
