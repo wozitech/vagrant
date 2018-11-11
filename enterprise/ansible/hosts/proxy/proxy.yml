@@ -8,7 +8,8 @@
     - ../../vars.yml
 
   tasks:
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
-    - import_tasks: tasks/network.yml
+    # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    # - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+    # - import_tasks: tasks/network.yml
+    - import_tasks: tasks/nginx.yml
 

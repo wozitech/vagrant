@@ -1,0 +1,21 @@
+# proxy nginx tasks
+---
+
+- name: create the nginx container
+  become: true
+  docker_container:
+    name: nginx
+    image: jwilder/nginx-proxy:latest
+    state: started
+    detach: yes
+    volumes:
+      - "/var/run/docker:/tmp/docker.sock:ro"
+    ports:
+      - "{{ forward_proxy_ip }}:8080:8080/tcp"
+      - "{{ forward_proxy_ip }}:8443:8443/tcp"
+    env:
+      VIRTUAL_PORT: 8080
+
+
+
+# /etc/nginx/dhparam/dhparam.pem

@@ -1,6 +1,8 @@
 ---
 # builds vagrant/libvirt/ansible capable CentOS/RHEL/fedora host
 
+# to run this locally: ansible-playbook --connection=local --inventory 127.0.0.1, ansible-vagrant-fedora-centos-rhel-host.yml
+
 - name: Configures this host as a vagrant/libvirt/ansible drive host
   hosts: 127.0.0.1
   connection: local
@@ -12,19 +14,28 @@
       name: "*"
       state: latest
       #exclude: git*
+    when:
+      - ansible_pkg_mgr == "yum"
+      - os_update is defined
+      - os_update == 1
 
   - name: install the 'Development tools' package group
     yum:
       name: "@Development tools"
-      state: present
-
-  - name: Install vagrant
-    yum:
-      name: "{{ packages }}"
       state: latest
-    vars:
-      packages:
-      - "@vagrant"
-      - vagrant-libvirt
+
+  - name: Install vagrant and ansible
+    yum:
+      name:
+        - "@vagrant"
+        - vagrant-libvirt
+        - ansible
+      state: latest
+
+  - name: Install ansible extensions for docker
+    pip:
+      name:
+        - ansible-container[docker]
+        - docker-py
 
 # note - install of the vargant-libvirt package installs the plugin to vagrant too

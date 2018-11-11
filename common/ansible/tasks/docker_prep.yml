@@ -39,3 +39,17 @@
     name: docker
     state: started
     enabled: true
+
+- name: Install python dependencies
+  become: true
+  yum:
+    name:
+        - python-pip
+        - python-setuptools
+    state: latest
+
+- name: Install python extensions for docker (used by ansible)
+  become: true
+  pip:
+    name:
+      - docker-py
