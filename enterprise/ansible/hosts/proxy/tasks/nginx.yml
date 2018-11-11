@@ -1,6 +1,30 @@
 # proxy nginx tasks
 ---
 
+- name: Ensure directory for SSL certs exists
+  become: true
+  file:
+    path: "{{ SSL_CERTS_DIR }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
+- name: Generate self signed SSL certificates
+  become: true
+  command: >
+    openssl req
+      -new
+      -newkey rsa:4096
+      -days 3650
+      -nodes
+      -x509
+      -subj "/C=US/ST=NY/L=NY/O=NA/CN={{ DEFAULT_DOMAIN_NAME }}"
+      -keyout "{{ SSL_CERTS_DIR }}/default.key"
+      -out "{{ SSL_CERTS_DIR }}/default.crt"
+  args:
+    creates: "{{ SSL_CERTS_DIR }}/default.crt"
+
 - name: create the nginx container
   become: true
   docker_container:
@@ -10,12 +34,10 @@
     detach: yes
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
     ports:
       - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
-      - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
-    #env:
-    #  VIRTUAL_PORT: "{{ NON_SSL_PORT }}"
-
+      - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ SSL_PORT }}/tcp"
 
 - name: Enable nginx inbound on public zone (non-ssl)
   become: true
@@ -41,6 +63,3 @@
     name: firewalld
     state: restarted
   when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
-
-
-# /etc/nginx/dhparam/dhparam.pem

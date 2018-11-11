@@ -8,12 +8,15 @@
     - ../../vars.yml
 
   vars:
+    DISABLE_HOST_FIREWALL: true
     NON_SSL_PORT: 80
-    SSL_PORT: 433
+    SSL_PORT: 443
+    SSL_CERTS_DIR: /etc/nginx/certs
+    DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
 
   tasks:
+    # - import_tasks: tasks/network.yml
     # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
     # - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
-    # - import_tasks: tasks/network.yml
     - import_tasks: tasks/nginx.yml
 

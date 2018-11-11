@@ -11,17 +11,15 @@
     - os_update is defined
     - os_update == 1
 
-- name: Install default packages
-  become: true
-  yum:
-    name: "{{ item.name }}"
-    state: "{{ item.state }}"
-  with_items:
-    - "{{ default_os_packages }}"
-  when:
-    - ansible_pkg_mgr == "yum"
-    - build_stage is defined
-    - build_stage is search("1")
+# - name: Install default packages
+#   become: true
+#   yum:
+#     name: "{{ item.name }}"
+#     state: "{{ item.state }}"
+#   with_items:
+#     - "{{ default_os_packages }}"
+#   when:
+#     - ansible_pkg_mgr == "yum"
 
 - name: Default groups
   become: true
@@ -31,9 +29,6 @@
     state: present
   with_items:
     - "{{ default_groups }}"
-  when:
-    - build_stage is defined
-    - build_stage is search("2")
 
 - name: Default users
   become: true
@@ -49,9 +44,6 @@
     state: present
   with_items:
     - "{{ default_users }}"
-  when:
-    - build_stage is defined
-    - build_stage is search("2")
 
 # could add wit-admin to sudo's, but it's just as easy to use existing wheel; but we want to use NOPASSWD
 - name: sudoers "wit-admin" group - NOPASSWD
@@ -63,7 +55,6 @@
     group: root
     mode: 0600
     validate: "/usr/sbin/visudo -cf %s"
-
 
 - name: firewalld zone network eth0 interface
   become: true
@@ -84,6 +75,7 @@
     name: firewalld
     state: started
     enabled: true
+  when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
 
 - name: Enable SSH and DHCP client only on trusted zone
   become: true
@@ -95,6 +87,7 @@
     - ssh
     - dhcpv6-client
   register: trusted_updated
+  when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
 
 - name: Disable SSH/DHCP from on public zone
   become: true
@@ -107,6 +100,7 @@
     - ssh
     - dhcpv6-client
   register: public_updated
+  when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
 
 - name: Restart firewall for changes to take effect
   become: true
