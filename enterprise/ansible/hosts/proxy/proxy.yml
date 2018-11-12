@@ -21,6 +21,7 @@
     VIRTUAL_HOST_WIKI: wozitech.asuscomm.com
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
+    REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
 
   tasks:
     # - import_tasks: tasks/network.yml

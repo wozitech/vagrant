@@ -19,16 +19,6 @@
     owner: root
     group: root
 
-- name: Ensure directory for local WOZiTech specific html exists
-  become: true
-  file:
-    path: "{{ HTML_DIR }}/wozitech"
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
-
-
 - name: Ensure directory for local conf exists
   become: true
   file:
@@ -50,14 +40,6 @@
 - name: Copy top level HTML placeholders
   become: true
   copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
-  with_items:
-    - index.html
-    - 50x.html
-  changed_when: false
-
-- name: Copy WOZiTech Virtual Host HTML placeholders
-  become: true
-  copy: src="../files/html/wozitech/{{ item }}"  dest="{{ HTML_DIR }}/wozitech"  mode=0644
   with_items:
     - index.html
     - 50x.html
