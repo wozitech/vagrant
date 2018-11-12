@@ -11,14 +11,16 @@
     DISABLE_HOST_FIREWALL: true
     NON_SSL_PORT: 80
     SSL_PORT: 443
-    SSL_CERTS_DIR: /etc/nginx/certs
+    NGINX_BASE_DIR: /etc/nginx
+    SSL_CERTS_DIR: "{{ NGINX_BASE_DIR }}/certs"
+    CONF_CERTS_DIR: "{{ NGINX_BASE_DIR }}/conf"
     HTML_DIR: /var/www/html
-    VHOSTS_DIR: /etc/nginx/vhost.d
+    VHOSTS_CONF_DIR: "{{ NGINX_BASE_DIR }}/conf.d"
     DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
     NGINX_CONTAINER_NAME: nginx
     VIRTUAL_HOST_WIKI: wozitech.asuscomm.com
-    NGINX_PROXY_DEFAULTS_CONF_FILE: /etc/nginx/default_proxy.conf
-    NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
+    NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
+    DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
 
   tasks:
     # - import_tasks: tasks/network.yml

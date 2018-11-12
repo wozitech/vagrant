@@ -19,16 +19,35 @@
     owner: root
     group: root
 
-- name: Ensure directory for local vhosts exists
+- name: Ensure directory for local WOZiTech specific html exists
   become: true
   file:
-    path: "{{ VHOSTS_DIR }}"
+    path: "{{ HTML_DIR }}/wozitech"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+
+- name: Ensure directory for local conf exists
+  become: true
+  file:
+    path: "{{ CONF_CERTS_DIR }}"
     state: directory
     mode: 0750
     owner: root
     group: root
 
-- name: Copy HTML placeholders
+- name: Ensure directory for local vhosts exists
+  become: true
+  file:
+    path: "{{ VHOSTS_CONF_DIR }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
+- name: Copy top level HTML placeholders
   become: true
   copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
   with_items:
@@ -36,14 +55,36 @@
     - 50x.html
   changed_when: false
 
-- name: Copy default proxy conf
+- name: Copy WOZiTech Virtual Host HTML placeholders
   become: true
-  copy: src="../files/conf/defaults.conf"  dest="{{ NGINX_PROXY_DEFAULTS_CONF_FILE }}"  mode=0644
+  copy: src="../files/html/wozitech/{{ item }}"  dest="{{ HTML_DIR }}/wozitech"  mode=0644
+  with_items:
+    - index.html
+    - 50x.html
   changed_when: false
 
-- name: Copy wiki proxy conf
+- name: Copy nginx conf
   become: true
-  copy: src="../files/conf/wiki-reverse.conf"  dest="{{ NGINX_PROXY_WIKI_CONF_FILE }}"  mode=0644
+  copy: src="../files/nginx.conf"  dest="{{ NGINX_BASE_DIR }}/nginx.conf"  mode=0644
+  changed_when: false
+
+- name: Copy default conf
+  become: true
+  copy: src="../files/default.conf"  dest="{{ VHOSTS_CONF_DIR }}/default.conf"  mode=0644
+  changed_when: false
+
+- name: Copy additional static confs
+  become: true
+  copy: src="../files/conf/{{ item }}"  dest="{{ CONF_CERTS_DIR }}"  mode=0644
+  with_items:
+    - fastcgi.conf
+    - mime.types
+    - proxy.conf
+  changed_when: false
+
+- name: Generate wiki reverse proxy conf
+  become: true
+  template: src="../templates/wiki-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI_CONF_FILE }}"  mode=0644
   changed_when: false
 
 - name: Generate default self signed SSL certificates
@@ -61,25 +102,43 @@
   args:
     creates: "{{ SSL_CERTS_DIR }}/default.crt"
 
-- name: create the nginx container
+- name: Generate wozitech virtual host domain self signed SSL certificates
+  become: true
+  command: >
+    openssl req
+      -new
+      -newkey rsa:4096
+      -days 3650
+      -nodes
+      -x509
+      -subj "/C=US/ST=NY/L=NY/O=NA/CN={{ VIRTUAL_HOST_WIKI }}"
+      -keyout "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.key"
+      -out "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.crt"
+  args:
+    creates: "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.crt"
+
+- name: Generate the dhparam.pem file
+  become: true
+  command: openssl dhparam -out "{{ DHPARAM_FILE }}" 2048
+  args:
+    creates: "{{ DHPARAM_FILE }}"
+
+- name: create the default nginx container
   become: true
   docker_container:
     name: "{{ NGINX_CONTAINER_NAME }}"
-    image: jwilder/nginx-proxy:latest
+    image: nginx
     state: started
     detach: yes
     volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
-      - "{{ VHOSTS_DIR }}:/etc/nginx/vhost.d"
       - "{{ HTML_DIR }}:/usr/share/nginx/html"
-      - "{{ NGINX_PROXY_DEFAULTS_CONF_FILE }}:/etc/nginx/conf.d/wozitech_defaults.conf:ro"
+      - "{{ CONF_CERTS_DIR }}:/etc/nginx/conf:ro"
+      - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d:ro"
+      - "{{ NGINX_BASE_DIR }}/nginx.conf:/etc/nginx/nginx.conf:ro"
     ports:
       - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
       - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ SSL_PORT }}/tcp"
-    labels: { com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy : "true" }
-    env:
-      VIRTUAL_HOST: "{{ VIRTUAL_HOST_WIKI }}"
 
 - name: Enable nginx inbound on public zone (non-ssl)
   become: true
@@ -107,24 +166,24 @@
   when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
 
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
-- name: Install nginx service
-  become: true
-  template:
-      src: ../templates/nginx.docker.service.j2
-      dest: /usr/lib/systemd/system/nginx.service
-      owner: root
-      group: root
-      mode: 0644
-  vars:
-    nginx_srv:
-      name: "{{  NGINX_CONTAINER_NAME }}"
-  register: nginx_service_install
+# - name: Install nginx service
+#   become: true
+#   template:
+#       src: ../templates/nginx.docker.service.j2
+#       dest: /usr/lib/systemd/system/nginx.service
+#       owner: root
+#       group: root
+#       mode: 0644
+#   vars:
+#     nginx_srv:
+#       name: "{{  NGINX_CONTAINER_NAME }}"
+#   register: nginx_service_install
 
-- name: Enable and start nginx docker service
-  become: true
-  systemd:
-    name: "{{ NGINX_CONTAINER_NAME }}"
-    state: started
-    enabled: true
-    daemon_reload: yes
-  when: nginx_service_install.changed
+# - name: Enable and start nginx docker service
+#   become: true
+#   systemd:
+#     name: "{{ NGINX_CONTAINER_NAME }}"
+#     state: started
+#     enabled: true
+#     daemon_reload: yes
+#   when: nginx_service_install.changed

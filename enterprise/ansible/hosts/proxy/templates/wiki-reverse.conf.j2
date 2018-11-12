@@ -1,0 +1,19 @@
+
+server {
+        server_name {{ VIRTUAL_HOST_WIKI }};
+        listen {{ NON_SSL_PORT }};
+        access_log /var/log/nginx/access.log vhost;
+
+        root /usr/share/nginx/html/wozitech;
+}
+server {
+        server_name {{ VIRTUAL_HOST_WIKI }};
+        listen {{ SSL_PORT }} ssl http2;
+        access_log /var/log/nginx/access.log vhost;
+      
+        ssl_session_tickets off;
+        ssl_certificate /etc/nginx/certs/{{ VIRTUAL_HOST_WIKI }}.crt;
+        ssl_certificate_key /etc/nginx/certs/{{ VIRTUAL_HOST_WIKI }}.key;
+
+        root /usr/share/nginx/html/wozitech;
+}
