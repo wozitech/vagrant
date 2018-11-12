@@ -14,8 +14,9 @@ To run with debug:
 
 # Docker
 Useful docker commands:
-* `docker [start|stop|logs <name of container>`
-* `docker exec -it <name of container> /bin/bash`
+* `docker [start|stop|logs <container_id>`
+* `docker exec -it <container_id> /bin/bash`
+* `docker commit <container_id> <new_container_id> && docker run -it <new_container_id> /bin/bash` - duplicates a container that is failing to start
 
 On a failing docker container, bash interactively into it, and for any missing dependencies like vi(m) and netstat, simply install them (yum|apt-get)
 
