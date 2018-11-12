@@ -2,3 +2,7 @@ enterprise/ansible/hosts/extranet/templates/wikijs_config.yml.j2 eol=lf
 enterprise/ansible/hosts/extranet/templates/wikijs.service.j2 eol-lf
 enterprise/ansible/hosts/extranet/templates/wikijs.service.shj2 eol-lf
 enterprise/ansible/hosts/proxy/templates/nginx.docker.service.j2 eol-lf
+enterprise/ansible/hosts/proxy/files/html/50x.html eol-lf
+enterprise/ansible/hosts/proxy/files/html/index.html eol-lf
+enterprise/ansible/hosts/proxy/files/conf/defaults.conf eol-lf
+enterprise/ansible/hosts/proxy/files/conf/wiki-reverse.conf eol-lf
