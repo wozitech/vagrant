@@ -10,3 +10,5 @@ proxy_fqdn: "{{ proxy_hostname }}.{{ root_domain}}"
 webserver_fqdn: "{{ webserver_hostname }}.{{ root_domain}}"
 
 root_dns: "192.168.1.1"          # subject to change
+
+wiki_external_domain: wozitech.asuscomm.com

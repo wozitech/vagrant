@@ -7,8 +7,9 @@
     - vars/nvm.yml
 
   vars:
-    nodejs_version: "v8.11.4"
     #nodejs_version: "v10.13.0"
+    nodejs_version: "v8.11.4"
+    wiki_external_url: "https://{{ wiki_external_domain }}/"
 
   tasks:
     - import_tasks: tasks/network.yml

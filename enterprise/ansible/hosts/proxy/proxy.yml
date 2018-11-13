@@ -18,7 +18,7 @@
     VHOSTS_CONF_DIR: "{{ NGINX_BASE_DIR }}/conf.d"
     DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
     NGINX_CONTAINER_NAME: nginx
-    VIRTUAL_HOST_WIKI: wozitech.asuscomm.com
+    VIRTUAL_HOST_WIKI: "{{ wiki_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
