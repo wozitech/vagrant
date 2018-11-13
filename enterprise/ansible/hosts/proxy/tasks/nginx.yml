@@ -10,6 +10,15 @@
     owner: root
     group: root
 
+- name: Ensure directory for target SSL certs exists for the target domain
+  become: true
+  file:
+    path: "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
 - name: Ensure directory for local html exists
   become: true
   file:
@@ -94,10 +103,10 @@
       -nodes
       -x509
       -subj "/C=US/ST=NY/L=NY/O=NA/CN={{ VIRTUAL_HOST_WIKI }}"
-      -keyout "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.key"
-      -out "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.crt"
+      -keyout "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/privkey.pem"
+      -out "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/fullchain.pem"
   args:
-    creates: "{{ SSL_CERTS_DIR }}/{{ VIRTUAL_HOST_WIKI }}.crt"
+    creates: "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/fullchain.pem"
 
 - name: Generate the dhparam.pem file
   become: true
