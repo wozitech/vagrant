@@ -67,7 +67,7 @@
 - name: Generate wiki reverse proxy conf
   become: true
   template: src="../templates/wiki-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI_CONF_FILE }}"  mode=0644
-  changed_when: false
+  register: wiki_reverse_proxy
 
 - name: Generate default self signed SSL certificates
   become: true
@@ -84,7 +84,7 @@
   args:
     creates: "{{ SSL_CERTS_DIR }}/default.crt"
 
-- name: Generate wozitech virtual host domain self signed SSL certificates
+- name: Generate default wozitech virtual host domain self signed SSL certificates - only if certificates not already there
   become: true
   command: >
     openssl req
@@ -116,8 +116,9 @@
       - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
       - "{{ HTML_DIR }}:/usr/share/nginx/html"
       - "{{ CONF_CERTS_DIR }}:/etc/nginx/conf:ro"
-      - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d:ro"
+      - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d"
       - "{{ NGINX_BASE_DIR }}/nginx.conf:/etc/nginx/nginx.conf:ro"
+      - "{{ ACME_CHALLENGE_DIR }}:/usr/share/nginx/html/acme"
     ports:
       - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
       - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ SSL_PORT }}/tcp"
@@ -169,3 +170,16 @@
     enabled: true
     daemon_reload: yes
   when: nginx_service_install.changed
+
+- name: Restart nginx docker service
+  become: true
+  systemd:
+    name: "{{ NGINX_CONTAINER_NAME }}"
+    state: restarted
+  when:
+    - wiki_reverse_proxy.changed
+    - not nginx_service_install.changed
+
+
+
+  
