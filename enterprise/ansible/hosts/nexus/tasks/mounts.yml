@@ -31,7 +31,6 @@
 - name: creating Nexus filesystem
   become: true
   filesystem: fstype=ext4 dev=/dev/nexus_vg/nexus_lv
-  #when: nexus_lvm_created.changed
   register: nexus_filesystem_created
 
 - name: mounting Nexus filesystem
@@ -41,13 +40,8 @@
     src: /dev/nexus_vg/nexus_lv
     fstype: ext4 
     state: mounted
-  #when:
-  #  - nexus_lvm_created.changed
-  #  - nexus_filesystem_created.changed
+
 
 - name: resizing Nexus filesystem
   become: true
   command: resize2fs /dev/nexus_vg/nexus_lv
-  #when:
-  #  - nexus_lvm_created.changed
-  #  - nexus_filesystem_created.ok
