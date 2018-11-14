@@ -1,0 +1,53 @@
+# local file systems
+# Using LVM volume -  so it can be managed going forward
+---
+
+# - name: Install LVM subsystem
+#   become: true
+#   yum:
+#     name:
+#         - system-storage-manager
+#         - lvm2
+#     state: latest
+#   when:
+#     - ansible_pkg_mgr == "yum"
+  
+- name: creating new LVM volume group
+  become: true
+  lvg:
+    vg: nexus_vg
+    pvs: "{{ lvm_disks }}"
+    state: present
+    
+- name: Create nexus LVM
+  become: true
+  lvol:
+    vg: nexus_vg
+    lv: nexus_lv
+    size: 100%PVS
+    resizefs: true
+  register: nexus_lvm_created
+
+- name: creating Nexus filesystem
+  become: true
+  filesystem: fstype=ext4 dev=/dev/nexus_vg/nexus_lv
+  #when: nexus_lvm_created.changed
+  register: nexus_filesystem_created
+
+- name: mounting Nexus filesystem
+  become: true
+  mount:
+    path: "{{ lvm_mount }}"
+    src: /dev/nexus_vg/nexus_lv
+    fstype: ext4 
+    state: mounted
+  #when:
+  #  - nexus_lvm_created.changed
+  #  - nexus_filesystem_created.changed
+
+- name: resizing Nexus filesystem
+  become: true
+  command: resize2fs /dev/nexus_vg/nexus_lv
+  #when:
+  #  - nexus_lvm_created.changed
+  #  - nexus_filesystem_created.ok

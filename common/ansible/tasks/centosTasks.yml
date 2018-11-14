@@ -77,17 +77,17 @@
     enabled: true
   when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
 
-- name: Enable SSH and DHCP client only on trusted zone
-  become: true
-  firewalld:
-    state: enabled
-    zone: trusted
-    service: "{{ item }}"
-  with_items:
-    - ssh
-    - dhcpv6-client
-  register: trusted_updated
-  when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
+# - name: Enable SSH and DHCP client only on trusted zone - NOT REQUIRED, because trusted zone by default accepts all
+#   become: true
+#   firewalld:
+#     state: enabled
+#     zone: trusted
+#     service: "{{ item }}"
+#   with_items:
+#     - ssh
+#     - dhcpv6-client
+#   register: trusted_updated
+#   when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
 
 - name: Disable SSH/DHCP from on public zone
   become: true
@@ -101,6 +101,12 @@
     - dhcpv6-client
   register: public_updated
   when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL
+
+# - name: Change trusted zone target from ACCEPT to DEFAULT; thus applying the rules
+#   become: true
+#   firewalld_zones:
+#     - name: "trusted"
+#       target: "default"
 
 - name: Restart firewall for changes to take effect
   become: true

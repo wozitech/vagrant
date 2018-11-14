@@ -6,36 +6,48 @@
 - name: Configures this host as a vagrant/libvirt/ansible drive host
   hosts: 127.0.0.1
   connection: local
-  become: yes
   tasks:
+    - name: update the local repo
+      become: true
+      yum:
+        name: "*"
+        state: latest
+        #exclude: git*
+      when:
+        - ansible_pkg_mgr == "yum"
+        - os_update is defined
+        - os_update == 1
 
-  - name: update the local repo
-    yum:
-      name: "*"
-      state: latest
-      #exclude: git*
-    when:
-      - ansible_pkg_mgr == "yum"
-      - os_update is defined
-      - os_update == 1
+    - name: install the 'Development tools' package group
+      become: true
+      yum:
+        name: "@Development tools"
+        state: latest
 
-  - name: install the 'Development tools' package group
-    yum:
-      name: "@Development tools"
-      state: latest
+    - name: Install vagrant and ansible
+      become: true
+      yum:
+        name:
+          - "@vagrant"
+          - vagrant-libvirt
+          - ansible
+        state: latest
 
-  - name: Install vagrant and ansible
-    yum:
-      name:
-        - "@vagrant"
-        - vagrant-libvirt
-        - ansible
-      state: latest
+    - name: Install ansible extensions for docker
+      become: true
+      pip:
+        name:
+          - ansible-container[docker]
+          - docker-py
 
-  - name: Install ansible extensions for docker
-    pip:
-      name:
-        - ansible-container[docker]
-        - docker-py
+  # note - install of the vargant-libvirt package installs the plugin to vagrant too
 
-# note - install of the vargant-libvirt package installs the plugin to vagrant too
+    - name: Clone firewalld ansible extension https://github.com/ptrunk/ansible-firewalld as a system role
+      become: true
+      git:
+        repo: https://github.com/ptrunk/ansible-firewalld
+        dest: /etc/ansible/roles/ptrunk.firewalld
+        update: no
+
+    - name: Install ansible-thoteam.nexus3-oss ansible role
+      shell: ansible-galaxy install ansible-thoteam.nexus3-oss
