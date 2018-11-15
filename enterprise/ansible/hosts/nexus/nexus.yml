@@ -126,12 +126,16 @@
     nexus_backup_rotate_first: false
     nexus_backup_keep_rotations: 4  # Keep 4 backup rotation by default (current + last 3)
 
+  pre_tasks:
+    - import_tasks: tasks/network.yml
+    - import_tasks: tasks/mounts.yml
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
 
   roles:
-    # - ptrunk.firewalld
+    - ptrunk.firewalld
     # - ansible-thoteam.nexus3-oss
 
-  tasks:
-    # - import_tasks: tasks/network.yml
-    - import_tasks: tasks/mounts.yml
-    # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+  tasks: []
+
+  post_tasks: []
+

@@ -29,7 +29,7 @@
 - name: Restart networking
   become: true
   service: name=network state=restarted
-  when: eth1_config.changed or eth11_config or eth0_gw_remove.changed or eth1_gw_add.changed or eth0_dns_remove.changed
+  when: eth1_config.changed or eth0_gw_remove.changed or eth1_gw_add.changed or eth0_dns_remove.changed
   
 - name: Get fully qualified hostname
   become: true
