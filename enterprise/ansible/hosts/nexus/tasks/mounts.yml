@@ -2,15 +2,15 @@
 # Using LVM volume -  so it can be managed going forward
 ---
 
-# - name: Install LVM subsystem
-#   become: true
-#   yum:
-#     name:
-#         - system-storage-manager
-#         - lvm2
-#     state: latest
-#   when:
-#     - ansible_pkg_mgr == "yum"
+- name: Install LVM subsystem
+  become: true
+  yum:
+    name:
+        - system-storage-manager
+        - lvm2
+    state: present
+  when:
+    - ansible_pkg_mgr == "yum"
   
 - name: creating new LVM volume group
   become: true

@@ -22,7 +22,7 @@
       become: true
       yum:
         name: "@Development tools"
-        state: latest
+        state: present
 
     - name: Install vagrant and ansible
       become: true
@@ -31,7 +31,7 @@
           - "@vagrant"
           - vagrant-libvirt
           - ansible
-        state: latest
+        state: present
 
     - name: Install ansible extensions for docker
       become: true

@@ -31,7 +31,7 @@
         - device-mapper-persistent-data
         - lvm2
         - docker-ce
-    state: latest
+    state: present
 
 - name: Enable and start docker service
   become: true
@@ -46,7 +46,7 @@
     name:
         - python-pip
         - python-setuptools
-    state: latest
+    state: present
 
 - name: Install python extensions for docker (used by ansible)
   become: true

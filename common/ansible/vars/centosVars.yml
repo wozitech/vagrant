@@ -1,16 +1,16 @@
 default_os_packages:
-  - { name: epel-release, state: latest }
-  - { name: net-tools, state: latest }
-  - { name: bind-utils, state: latest }
-  - { name: dos2unix, state: latest }
-  - { name: NetworkManager-glib, state: latest }
-  - { name: libnm-gtk-devel.x86_64, state: latest }
-  - { name: nm-connection-editor.x86_64, state: latest }
-  - { name: libsemanage-python, state: latest }
-  - { name: policycoreutils-python, state: latest }
-  - { name: openssl-devel, state: latest }
-  - { name: libselinux-python, state: latest }
-  - { name: traceroute, state: latest }
+  - { name: epel-release, state: present }
+  - { name: net-tools, state: present }
+  - { name: bind-utils, state: present }
+  - { name: dos2unix, state: present }
+  - { name: NetworkManager-glib, state: present }
+  - { name: libnm-gtk-devel.x86_64, state: present }
+  - { name: nm-connection-editor.x86_64, state: present }
+  - { name: libsemanage-python, state: present }
+  - { name: policycoreutils-python, state: present }
+  - { name: openssl-devel, state: present }
+  - { name: libselinux-python, state: present }
+  - { name: traceroute, state: present }
   - { name: tcpdump, state: absent }
   - { name: telnet, state: absent }
 

@@ -6,10 +6,10 @@
     name: "{{ item.name }}"
     state: "{{ item.state }}"
   with_items:
-    - { name: git, state: latest }
-    - { name: gcc, state: latest }
-    - { name: gcc-c++, state: latest }
-    - { name: make, state: latest }
+    - { name: git, state: present }
+    - { name: gcc, state: present }
+    - { name: gcc-c++, state: present }
+    - { name: make, state: present }
   when:
     - ansible_pkg_mgr == "yum"
     - build_stage is defined

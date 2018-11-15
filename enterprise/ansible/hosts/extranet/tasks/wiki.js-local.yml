@@ -2,25 +2,25 @@
 # TODO:
 # 1. With HTTPS reverse proxy: https://docs.requarks.io/wiki/administration/setup-nginx-reverse-proxy
 ---
-# - name: Install specific yum Dependencies (git upgrade to V2)
-#   become: true
-#   yum:
-#     name: "{{ item.name }}"
-#     state: "{{ item.state }}"
-#   with_items:
-#     - { name: centos-release-scl, state: latest }
-#     - { name: sclo-git212.x86_64, state: latest }
-#   when:
-#     - ansible_pkg_mgr == "yum"
+- name: Install specific yum Dependencies (git upgrade to V2)
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: centos-release-scl, state: present }
+    - { name: sclo-git212.x86_64, state: present }
+  when:
+    - ansible_pkg_mgr == "yum"
 
-# - name: allow git2 for all users
-#   become: true
-#   copy:
-#     content: source scl_source enable sclo-git212
-#     dest: /etc/profile.d/git2.sh
-#     owner: root
-#     group: root
-#     mode: 755
+- name: allow git2 for all users
+  become: true
+  copy:
+    content: source scl_source enable sclo-git212
+    dest: /etc/profile.d/git2.sh
+    owner: root
+    group: root
+    mode: 755
 
 - name: wikijs group
   become: true
@@ -37,7 +37,6 @@
     uid: 10000
     group: "{{ wikijs_group }}"
     home: "{{ wikijs_path }}"
-    #groups: "{{ item.groups }}"
     create_home: no
     append: no
     generate_ssh_key: no

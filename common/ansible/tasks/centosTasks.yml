@@ -11,15 +11,15 @@
     - os_update is defined
     - os_update == 1
 
-# - name: Install default packages
-#   become: true
-#   yum:
-#     name: "{{ item.name }}"
-#     state: "{{ item.state }}"
-#   with_items:
-#     - "{{ default_os_packages }}"
-#   when:
-#     - ansible_pkg_mgr == "yum"
+- name: Install default packages
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - "{{ default_os_packages }}"
+  when:
+    - ansible_pkg_mgr == "yum"
 
 - name: Default groups
   become: true
