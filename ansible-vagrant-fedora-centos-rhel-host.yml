@@ -51,3 +51,7 @@
 
     - name: Install ansible-thoteam.nexus3-oss ansible role
       shell: ansible-galaxy install ansible-thoteam.nexus3-oss
+
+    - name: Install bertvv.dnsmasq ansible role
+      shell: ansible-galaxy install bertvv.dnsmasq
+      

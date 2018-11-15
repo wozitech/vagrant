@@ -25,13 +25,28 @@
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
     LETENCYRPT_ADMIN_EMAIL: admin@wozitech-ltd.co.uk
+    dnsmasq_domain: "{{ root_domain }}"
+    dnsmasq_listen_address: "{{ forward_proxy_ip }}"
+    dnsmasq_upstream_servers:
+      - "{{ root_dns }}"
+    dnsmasq_authoritative: true
+    dnsmasq_bogus_priv: false      # allows (false) reverse lookups on external IPs
+    dnsmasq_srv_hosts:
+      - name: _ldap._tcp.example.com
+        target: "ldap.{{ root_domain }}"
+        port: 389
+
 
   pre_tasks:
-    - import_tasks: tasks/network.yml
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+    # - import_tasks: tasks/network.yml
+    - import_tasks: tasks/dns.yml
+    # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    # - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+
+  roles:
+  #  - { role: bertvv.dnsmasq, become: yes }
 
   tasks:
-    - import_tasks: tasks/nginx.yml
-    - import_tasks: tasks/letsencrypt.yml
+    # - import_tasks: tasks/nginx.yml
+    # - import_tasks: tasks/letsencrypt.yml
 

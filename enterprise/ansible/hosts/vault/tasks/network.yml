@@ -8,7 +8,7 @@
       ifname: eth1
       ip: "{{ vault_ip }}"
       gateway: "{{ network_gw }}"
-      dns: "{{ root_dns }}"
+      dns: "{{ local_dns }}"
       netmask: "{{ netmask }}"
   register: eth1_config
 

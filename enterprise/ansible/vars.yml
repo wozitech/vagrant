@@ -15,6 +15,7 @@ webserver_fqdn: "{{ webserver_hostname }}.{{ root_domain}}"
 vault_fqdn: "{{ vault_hostname }}.{{ root_domain}}"
 nexus_fqdn: "{{ nexus_hostname }}.{{ root_domain}}"
 
-root_dns: "192.168.1.1"          # subject to change
+root_dns: "192.168.1.1"
+local_dns: "{{ forward_proxy_ip }}"
 
 wiki_external_domain: wozitech.asuscomm.com

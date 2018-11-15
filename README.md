@@ -12,6 +12,14 @@ To update OS packages:
 To run with debug:
 `ANSIBLE_ARGS='-vvv --extra-vars "os_update=1"' vagrant [provision|up] <name of host>`
 
+# Dependencies
+ansigle galazy roles:
+* bertvv.dnsmasq
+* ansible-thoteam.nexus3-oss
+
+github local roles:
+* https://github.com/ptrunk/ansible-firewalld
+
 # Docker
 Useful docker commands:
 * `docker [start|stop|logs <container_id>`
