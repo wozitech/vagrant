@@ -44,9 +44,9 @@
     - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
 
   roles:
-  #  - { role: bertvv.dnsmasq, become: yes }
+    - { role: bertvv.dnsmasq, become: yes }
 
   tasks:
-    # - import_tasks: tasks/nginx.yml
-    # - import_tasks: tasks/letsencrypt.yml
+    - import_tasks: tasks/nginx.yml
+    - import_tasks: tasks/letsencrypt.yml
 
