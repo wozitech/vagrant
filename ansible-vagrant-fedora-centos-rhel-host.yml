@@ -49,9 +49,11 @@
         dest: /etc/ansible/roles/ptrunk.firewalld
         update: no
 
-    - name: Install ansible-thoteam.nexus3-oss ansible role
+    - name: Install local ansible roles
       shell: ansible-galaxy install ansible-thoteam.nexus3-oss
+      with_items:
+        - ansiblebit.oracle-java
+        - ansible-thoteam.nexus3-oss
+        - bertvv.dnsmasq
 
-    - name: Install bertvv.dnsmasq ansible role
-      shell: ansible-galaxy install bertvv.dnsmasq
       
