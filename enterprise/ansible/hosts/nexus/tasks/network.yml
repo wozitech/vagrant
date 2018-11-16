@@ -52,3 +52,19 @@
 - name: New hostname
   debug:
     msg: "New hostname: {{ this_hostname.stdout }}"
+
+- name: Enable nexus inbound on public zone
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ NEXUS_PORT }}/tcp"
+    permanent: yes
+  register: nexus_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: nexus_firewalld.changed
