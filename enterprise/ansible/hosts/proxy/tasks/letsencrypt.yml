@@ -59,3 +59,25 @@
       CERTS_PATH: /etc/nginx/certs
       SERVER_CONTAINER: "{{ NGINX_CONTAINER_NAME }}"
 
+- name: Install letsencrypt service
+  become: true
+  template:
+      src: ../templates/letsencrypt.docker.service.j2
+      dest: /usr/lib/systemd/system/letsencrypt.service
+      owner: root
+      group: root
+      mode: 0644
+  vars:
+    srv:
+      name: "{{  LETSENCRYPT_CONTAINER_NAME }}"
+  register: letsencrypt_service_install
+
+- name: Enable and start letsencrypt docker service
+  become: true
+  systemd:
+    name: "{{ LETSENCRYPT_CONTAINER_NAME }}"
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: letsencrypt_service_install.changed
+
