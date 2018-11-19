@@ -9,7 +9,7 @@
   vars:
     #nodejs_version: "v10.13.0"
     nodejs_version: "v8.11.4"
-    wiki_external_url: "https://{{ wiki_external_domain }}/"
+    wiki_external_url: "https://{{ wiki_external_domain }}"
 
   pre_tasks:
     - import_tasks: tasks/network.yml
