@@ -24,13 +24,14 @@
         name: "@Development tools"
         state: present
 
-    - name: Install vagrant and ansible
+    # note, no ansible, because the fact we're using ansible requires that ansible is already installed
+    # Fedora Server by default includes the ansible runtime
+    - name: Install vagrant and libvirt integration - note, the support for libvirt restricts the version of vagrant to 2.0.2.
       become: true
       yum:
         name:
           - "@vagrant"
           - vagrant-libvirt
-          - ansible
         state: present
 
     - name: Install ansible extensions for docker
