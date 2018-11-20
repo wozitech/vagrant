@@ -32,6 +32,7 @@
         name:
           - "@vagrant"
           - vagrant-libvirt
+          - wget
         state: present
 
     - name: Install ansible extensions for docker
@@ -51,10 +52,18 @@
         update: no
 
     - name: Install local ansible roles
-      shell: ansible-galaxy install ansible-thoteam.nexus3-oss
+      shell: "ansible-galaxy install {{ item }}"
+      args:
+        creates: ".ansible/roles/{{ item }}/README.md"
       with_items:
         - ansiblebit.oracle-java
         - ansible-thoteam.nexus3-oss
         - bertvv.dnsmasq
 
-      
+# combined vagrant and terraform host
+    - name: Install Terrafrom
+      become: true
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/0.11.10/terraform_0.11.10_linux_amd64.zip
+        dest: /usr/bin
+        remote_src: True

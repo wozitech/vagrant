@@ -15,7 +15,8 @@ To run with debug:
 # Dependencies
 ansigle galazy roles:
 * bertvv.dnsmasq
-* ansible-thoteam.nexus3-oss
+* ansible-thoteam.nexus3-oss, which depends upon:
+    *  ansiblebit.oracle-java
 
 github local roles:
 * https://github.com/ptrunk/ansible-firewalld
