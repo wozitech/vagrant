@@ -1,0 +1,11 @@
+[Unit]
+Description=nginx container service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a {{ nginx_srv.name }}
+ExecStop=/usr/bin/docker stop -t 2 {{ nginx_srv.name }}
+
+[Install]
+WantedBy=local.target

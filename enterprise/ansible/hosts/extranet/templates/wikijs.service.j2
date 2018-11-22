@@ -1,0 +1,19 @@
+# wiki.js custom service script
+[Unit]
+Description=wikijs Service
+After=network.target
+Wants=mongod.service
+
+[Service]
+Type=simple
+User={{ wikijs_srv.user }}
+Group={{ wikijs_srv.group }}
+WorkingDirectory={{ wikijs_srv.path }}
+ExecStart=/opt/wikijs.service.sh START
+RemainAfterExit=true
+ExecStop=/opt/wikijs.service.sh STOP
+Restart=on-failure
+PIDFile={{ wikijs_srv.pid }}
+
+[Install]
+WantedBy=multi-user.target

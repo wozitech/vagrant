@@ -1,0 +1,32 @@
+# proxy's /etc/hosts - read by dnsmasq
+---
+
+- name: Ensure all local network hosts are defined
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item.name }}.{{ root_domain }}$'
+    line: "{{ item.ip }} {{ item.name }} {{ item.name}}.{{ root_domain }}"
+    state: present
+  with_items:
+    - { name: proxy, ip: 10.0.0.10 }
+    - { name: dns, ip: 10.0.0.10 }
+    - { name: proxy-reverse, ip: 10.0.0.10 }
+    - { name: proxy-forward, ip: 10.0.0.12 }
+    - { name: web1, ip: 10.0.0.21 }
+    - { name: nexus, ip: 10.0.0.31 }
+    - { name: vault, ip: 10.0.0.32 }
+    - { name: ldap, ip: 10.0.0.33 }
+    - { name: kctrl.dev, ip: 192.168.100.10 }
+    - { name: k1.dev, ip: 192.168.100.21 }
+    - { name: k2.dev, ip: 192.168.100.22}
+
+- name: Enable DNS inbound on public zone
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    service: "{{ item }}"
+  with_items:
+    - dns
+  when: DISABLE_HOST_FIREWALL is undefined or not DISABLE_HOST_FIREWALL

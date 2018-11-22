@@ -1,0 +1,66 @@
+# node native tasks
+---
+- name: Install specific yum Dependencies
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: git, state: present }
+    - { name: gcc, state: present }
+    - { name: gcc-c++, state: present }
+    - { name: make, state: present }
+  when:
+    - ansible_pkg_mgr == "yum"
+    - build_stage is defined
+    - build_stage is search("1")
+
+- name: install NVM (Node Version Manager)
+  become: true
+  git: repo=https://github.com/creationix/nvm.git dest={{ nvm_install_path }}
+
+- name: allow NVM for all users
+  become: true
+  template: src=../templates/nvm-profile-all-users.j2  dest=/etc/profile.d/allow-nvm-for-all-nvm.sh  owner=root group=root mode=755
+
+- name: copy scripts to server
+  become: true
+  copy: src="../files/{{ item }}"  dest="/opt/"  mode="a+x"
+  with_items:
+    - check-nodejs-version.sh
+    - install-nodejs.sh
+  changed_when: false         # TODO always reporting changed on every run; find out why.
+
+- name: Fix Windows line endings - we don't care if this reports any change
+  become: true
+  command: dos2unix "{{item}}"
+  with_items:
+    - /opt/check-nodejs-version.sh
+    - /opt/install-nodejs.sh
+    - /etc/profile.d/allow-nvm-for-all-nvm.sh
+  changed_when: false
+
+- name: query installed Node.js versions
+  become: true
+  shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
+  register: nodejs_info
+  changed_when: false
+
+- name: Current node.js version
+  debug:
+    msg: "Current Node runtime: {{ (nodejs_info.stdout|from_json).version.current }}. Target node runtime: {{ nodejs_version }}"
+
+- name: apply nvm.sh and set default version
+  become: true
+  shell: LC_ALL="en_US.UTF-8"  /opt/install-nodejs.sh  {{ nvm_exe_path }}  {{ nodejs_version }}
+  when: not (nodejs_info.stdout|from_json).ok  or  (nodejs_info.stdout|from_json).version.current != nodejs_version
+
+- name: query installed Node.js versions after applying nvm
+  become: true
+  shell: LC_ALL="en_US.UTF-8"  /opt/check-nodejs-version.sh  {{ nvm_exe_path }}
+  register: nodejs_info
+  changed_when: false
+
+- name: Current node.js version
+  debug:
+    msg: "Node runtime: {{ (nodejs_info.stdout|from_json).version.default }}"

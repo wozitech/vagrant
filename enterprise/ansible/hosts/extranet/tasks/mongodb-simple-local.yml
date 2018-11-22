@@ -1,0 +1,18 @@
+---
+- name: Add MongoDB repo
+  become: true
+  yum_repository:
+    name: Mongo3.6
+    description: MongoDB Version 3.6 Community Edition
+    baseurl: https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.6/x86_64/
+    #mirrorlist: http://mirrorlist.repoforge.org/el7/mirrors-rpmforge
+    enabled: yes
+    gpgcheck: no
+
+- name: Install MongoDB
+  become: true
+  yum: name=mongodb-org state=present
+
+- name: Enable and Start MongoDB
+  become: true
+  service: name=mongod state=started

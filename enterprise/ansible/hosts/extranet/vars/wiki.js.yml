@@ -1,0 +1,15 @@
+# wiki.js specific vars
+wikijs_user: wikijs
+wikijs_group: wikijs
+wikijs_parent_path: /var/www/nodejs
+wikijs_path: "{{ wikijs_parent_path }}/wikijs"
+wikijs_check_file: "{{ wikijs_path }}/wiki.js"
+wikijs_github_repo: https://github.com/wozitech/wiki.git
+wikijs_github_key_directory: /etc/wikijs/keys
+wikijs_github_key: "{{ wikijs_github_key_directory }}/wikijs-ecdsa"
+wikijs_github_public_key: "{{ wikijs_github_key }}.pub"
+wikijs_title: WOZiTech Limited Wiki
+wikijs_port: 3000
+wikijs_mongodb_uri: mongodb://localhost:27017/wiki
+wikijs_serverEmail: warren.ayling@wozitech-ltd.co.uk
+wikijs_pm2_pid: "{{ wikijs_path }}/.pm2/pids/wiki-0.pid"

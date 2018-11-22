@@ -1,0 +1,11 @@
+[Unit]
+Description=letsencrypt container service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a {{ srv.name }}
+ExecStop=/usr/bin/docker stop -t 2 {{ srv.name }}
+
+[Install]
+WantedBy=local.target

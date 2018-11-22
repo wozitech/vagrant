@@ -1,0 +1,95 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# wit home Enterprise virtual (KVM) servers:
+# 1. Proxy (forward and reverse)
+# 2. Extranet web server (wiki)
+
+Vagrant.configure("2") do |config|
+   
+  config.vm.box = "centos/7"
+  config.vm.synced_folder "./", "/vagrant", type: "nfs"
+
+  config.vm.provider :libvirt do |libvirt,override|
+    libvirt.host = "192.168.1.12"
+    libvirt.connect_via_ssh = true
+    libvirt.username = "aylingw"
+    #libvirt.password - leave blank, because using SSH to login with private key
+    #libvirt.id_ssh_key_file - leave blank which assumes the default ${HOME}/.ssh/id_rsa
+    libvirt.cpus = 1
+    libvirt.memory = 1024
+    libvirt.autostart = true
+    #libvirt.mgmt_attach = false
+  end
+
+  config.vm.define :proxy do |proxy|
+    proxy.vm.hostname = "proxy.wozitech.local"
+    proxy.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    proxy.vm.provider :libvirt do |domain|
+    end
+
+    proxy.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/proxy/proxy.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    proxy.vm.post_up_message = "The proxy server is up and running"
+  end
+
+  config.vm.define :web1 do |web|
+    web.vm.hostname = "web1.wozitech.local"
+    web.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    web.vm.provider :libvirt do |domain|
+    end
+
+    web.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/extranet/extranet.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    web.vm.post_up_message = "The Extranet web server is up and running"
+  end
+
+  config.vm.define :nexus do |nexus|
+    nexus.vm.hostname = "nexus.wozitech.local"
+    nexus.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    nexus.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.storage :file, :size => "40G", :type => "qcow2"
+    end
+
+    nexus.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/nexus/nexus.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    nexus.vm.post_up_message = "The nexus server is up and running"
+  end
+
+  config.vm.define :vault do |vault|
+    vault.vm.hostname = "vault.wozitech.local"
+    vault.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    vault.vm.provider :libvirt do |domain|
+    end
+
+    vault.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/vault/vault.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    vault.vm.post_up_message = "The Hashicorp Vault server is up and running"
+  end
+
+end

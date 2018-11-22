@@ -1,0 +1,156 @@
+# wiki.js native tasks - https://docs.requarks.io/wiki | https://docs.requarks.io/wiki/install/installation
+# TODO:
+# 1. With HTTPS reverse proxy: https://docs.requarks.io/wiki/administration/setup-nginx-reverse-proxy
+---
+- name: Install specific yum Dependencies (git upgrade to V2)
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: centos-release-scl, state: present }
+    - { name: sclo-git212.x86_64, state: present }
+  when:
+    - ansible_pkg_mgr == "yum"
+
+- name: allow git2 for all users
+  become: true
+  copy:
+    content: source scl_source enable sclo-git212
+    dest: /etc/profile.d/git2.sh
+    owner: root
+    group: root
+    mode: 755
+
+- name: wikijs group
+  become: true
+  group:
+    name: "{{ wikijs_group }}"
+    gid: 10000
+    state: present
+
+- name: wikijs user
+  become: true
+  user:
+    name: "{{ wikijs_user }}"
+    shell: /bin/bash
+    uid: 10000
+    group: "{{ wikijs_group }}"
+    home: "{{ wikijs_path }}"
+    create_home: no
+    append: no
+    generate_ssh_key: no
+    state: present
+
+# wiki.js is a node application which requires running a wizard on first install; it generates a config.yml file.
+- name: create wikijs parent installation directory
+  become: true
+  file:
+    path: "{{ wikijs_parent_path }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+
+# separate create tasks to allow for a dedicated uid/gid for wikijs
+- name: create wikijs installation directory
+  become: true
+  file:
+    path: "{{ wikijs_path }}"
+    state: directory
+    mode: 0700
+    owner: "{{ wikijs_user }}"
+    group: "{{ wikijs_group }}"
+
+- name: install wiki.js
+  become: true
+  become_user: "{{ wikijs_user }}"
+  shell: /bin/curl -sSo- https://wiki.js.org/install.sh | /bin/bash
+  args:
+    chdir: "{{ wikijs_path }}"
+    creates: "{{ wikijs_check_file }}"
+    warn: false
+  register: wikijs_install
+
+- name: create wikijs key directory
+  become: true
+  file:
+    path: /etc/wikijs/keys
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+- name: Generate private/public key
+  become: true
+  shell: /bin/ssh-keygen -f "{{ wikijs_github_key }}" -t ecdsa -b 521 -q -N ""
+  args:
+    creates: "{{ wikijs_github_public_key }}"
+- name: Must upload public key
+  debug:
+    msg: "Must upload {{ wikijs_github_public_key }} under 'Settings -> Deploy Keys' against {{ wikijs_github_repo }}"
+
+- name: Customise wikijs config.yml
+  become: true
+  become_user: "{{ wikijs_user }}"
+  template: src=../templates/wikijs_config.yml.j2 dest="{{ wikijs_path }}/config.yml"
+  vars:
+    wikijs_cfg:
+      title: "{{ wikijs_title }}"
+      port: "{{ wikijs_port }}"
+      mongodb_uri: "{{ wikijs_mongodb_uri }}"
+      github_key: "{{ wikijs_github_key }}"
+      server_email: "{{ wikijs_serverEmail }}"
+      github_repo: "{{ wikijs_github_repo }}"
+
+- name: Install wikijs service
+  become: true
+  template: src=../templates/wikijs.service.j2 dest=/usr/lib/systemd/system/wikijs.service
+  vars:
+    wikijs_srv:
+      user: "{{  wikijs_user }}"
+      group: "{{  wikijs_group }}"
+      path: "{{ wikijs_path }}"
+      pid: " {{ wikijs_pm2_pid }}"
+  register: wikijs_service_install
+
+- name: Install wikijs service script
+  become: true
+  template:
+    src: ../templates/wikijs.service.sh.j2
+    dest: "/opt/wikijs.service.sh"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Enable and start wikijs
+  become: true
+  systemd:
+    name: wikijs
+    state: started
+    enabled: true
+  when: not wikijs_service_install.changed
+
+- name: Reload systemd, enable and start wikijs
+  become: true
+  systemd:
+    name: wikijs
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: wikijs_service_install.changed
+
+- name: Enable wikijs inbound on public zone
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ wikijs_port }}/tcp"
+    permanent: yes
+  register: wikijs_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: wikijs_firewalld.changed

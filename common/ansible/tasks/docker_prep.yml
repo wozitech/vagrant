@@ -1,0 +1,55 @@
+# docker preparation
+---
+- name: Default overlay storage
+  become: true
+  copy:
+    content: "overlay\n"
+    dest: /etc/modules-load.d/overlay.conf
+    owner: root
+    group: root
+    mode: 0600
+  register: overlay_fs_enabled
+
+- name: Enable overlay if this is the first time
+  become: true
+  shell: /sbin/modprobe overlay
+  when: overlay_fs_enabled.changed
+
+- name: Add Docker CE repository
+  become: true
+  yum_repository:
+    name: docker
+    description: Docker CE repo
+    baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+    enabled: yes
+    gpgcheck: no
+
+- name: Install Docker packages
+  become: true
+  yum:
+    name:
+        - device-mapper-persistent-data
+        - lvm2
+        - docker-ce
+    state: present
+
+- name: Enable and start docker service
+  become: true
+  systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Install python dependencies
+  become: true
+  yum:
+    name:
+        - python-pip
+        - python-setuptools
+    state: present
+
+- name: Install python extensions for docker (used by ansible)
+  become: true
+  pip:
+    name:
+      - docker-py

@@ -1,0 +1,16 @@
+---
+- hosts: all
+  vars_files:
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
+
+  vars:
+    vault_version: "v10.13.0"
+    vault_port: 8000
+
+  roles:
+    # - ptrunk.firewalld
+
+  pre_tasks:
+    - import_tasks: tasks/network.yml
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
