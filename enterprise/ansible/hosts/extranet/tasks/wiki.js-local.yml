@@ -20,7 +20,7 @@
     dest: /etc/profile.d/git2.sh
     owner: root
     group: root
-    mode: 755
+    mode: 0755
 
 - name: wikijs group
   become: true
@@ -85,6 +85,17 @@
   shell: /bin/ssh-keygen -f "{{ wikijs_github_key }}" -t ecdsa -b 521 -q -N ""
   args:
     creates: "{{ wikijs_github_public_key }}"
+- name: correct ownership wikijs keys (owned by wikijs)
+  become: true
+  file:
+    path: "{{ item }}"
+    state: file
+    mode: 0600
+    owner: wikijs
+    group: wikijs
+  with_items:
+    - "{{ wikijs_github_key }}"
+    - "{{ wikijs_github_key }}.pub"
 - name: Must upload public key
   debug:
     msg: "Must upload {{ wikijs_github_public_key }} under 'Settings -> Deploy Keys' against {{ wikijs_github_repo }}"
@@ -100,7 +111,7 @@
       mongodb_uri: "{{ wikijs_mongodb_uri }}"
       github_key: "{{ wikijs_github_key }}"
       server_email: "{{ wikijs_serverEmail }}"
-      github_repo: "{{ wikijs_github_repo }}"
+      github_repo: "{{ wikijs_github_ssh_repo }}"
 
 - name: Install wikijs service
   become: true

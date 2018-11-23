@@ -7,6 +7,9 @@
 # need knowledge of the nvm/node environment - systemd does not take from /etc/profile.d
 source /etc/profile.d/allow-nvm-for-all-nvm.sh
 
+# need to source the correct version of git
+source /etc/profile.d/git2.sh
+
 NODE_EXECUTABLE=`which node`
 WIKI_PATH={{ wikijs_path }}
 

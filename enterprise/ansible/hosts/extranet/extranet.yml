@@ -11,11 +11,11 @@
     nodejs_version: "v8.11.4"
     wiki_external_url: "https://{{ wiki_external_domain }}"
 
-  pre_tasks:
-    - import_tasks: tasks/network.yml
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+  # pre_tasks:
+  #   - import_tasks: tasks/network.yml
+  #   - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
 
   tasks:
-    - import_tasks: tasks/node-native.yml
-    - import_tasks: tasks/mongodb-simple-local.yml
+    # - import_tasks: tasks/node-native.yml
+    # - import_tasks: tasks/mongodb-simple-local.yml
     - import_tasks: tasks/wiki.js-local.yml
