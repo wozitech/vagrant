@@ -5,6 +5,7 @@ wikijs_parent_path: /var/www/nodejs
 wikijs_path: "{{ wikijs_parent_path }}/wikijs"
 wikijs_check_file: "{{ wikijs_path }}/wiki.js"
 wikijs_github_repo: https://github.com/wozitech/wiki.git
+wikijs_github_ssh_repo: git@github.com:wozitech/wiki.git
 wikijs_github_key_directory: /etc/wikijs/keys
 wikijs_github_key: "{{ wikijs_github_key_directory }}/wikijs-ecdsa"
 wikijs_github_public_key: "{{ wikijs_github_key }}.pub"
