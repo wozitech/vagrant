@@ -61,59 +61,43 @@
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
 
-# - name: Enable nginx inbound on public zone (non-ssl)
+# FIREWALL IS DISABLED
+# - name: Enable postgres inbound on public zone
 #   become: true
 #   firewalld:
 #     state: enabled
 #     zone: public
-#     port: "{{ NON_SSL_PORT }}/tcp"
+#     port: "5432/tcp"
 #     permanent: yes
-#   register: nginx_non_ssl_firewalld
+#   register: postgres_firewalld
 
-# - name: Enable nginx inbound on public zone (ssl)
-#   become: true
-#   firewalld:
-#     state: enabled
-#     zone: public
-#     port: "{{ SSL_PORT }}/tcp"
-#     permanent: yes
-#   register: nginx_ssl_firewalld
-
+# FIREWALL IS DISABLED
 # - name: Restart firewall for changes to take effect
 #   become: true
 #   systemd:
 #     name: firewalld
 #     state: restarted
-#   when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
+#   when: postgres_firewalld.changed
 
-# # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
-# - name: Install nginx service
-#   become: true
-#   template:
-#       src: ../templates/nginx.docker.service.j2
-#       dest: /usr/lib/systemd/system/nginx.service
-#       owner: root
-#       group: root
-#       mode: 0644
-#   vars:
-#     nginx_srv:
-#       name: "{{  NGINX_CONTAINER_NAME }}"
-#   register: nginx_service_install
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
+- name: Install postgres service
+  become: true
+  template:
+      src: ../templates/postgres.docker.service.j2
+      dest: /usr/lib/systemd/system/postgres.service
+      owner: root
+      group: root
+      mode: 0644
+  vars:
+    postgres_srv:
+      name: "{{  DB_CONTAINER_NAME }}"
+  register: postgres_service_install
 
-# - name: Enable and start nginx docker service
-#   become: true
-#   systemd:
-#     name: "{{ NGINX_CONTAINER_NAME }}"
-#     state: started
-#     enabled: true
-#     daemon_reload: yes
-#   when: nginx_service_install.changed
-
-# - name: Restart nginx docker service
-#   become: true
-#   systemd:
-#     name: "{{ NGINX_CONTAINER_NAME }}"
-#     state: restarted
-#   when:
-#     - wiki_reverse_proxy.changed
-#     - not nginx_service_install.changed
+- name: Enable and start postgres docker service
+  become: true
+  systemd:
+    name: "{{ DB_CONTAINER_NAME }}"
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: postgres_service_install.changed

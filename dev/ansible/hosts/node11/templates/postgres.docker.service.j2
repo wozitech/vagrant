@@ -1,0 +1,11 @@
+[Unit]
+Description=postgres container service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a {{ postgres_srv.name }}
+ExecStop=/usr/bin/docker stop -t 2 {{ postgres_srv.name }}
+
+[Install]
+WantedBy=local.target
