@@ -1,0 +1,45 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# wit home Dev virtual (KVM) servers:
+# 1. node-10; a dockerised server including a minimum of two node V10.x containers and a postgresDB container
+
+Vagrant.configure("2") do |config|
+   
+  config.vm.box = "centos/7"
+  config.vm.synced_folder "./", "/vagrant", type: "nfs"
+
+  config.vm.provider :libvirt do |libvirt,override|
+    libvirt.host = "192.168.1.12"
+    libvirt.connect_via_ssh = true
+    libvirt.username = "aylingw"
+    #libvirt.password - leave blank, because using SSH to login with private key
+    #libvirt.id_ssh_key_file - leave blank which assumes the default ${HOME}/.ssh/id_rsa
+    libvirt.cpus = 1
+    libvirt.memory = 1024
+    libvirt.autostart = true
+    #libvirt.mgmt_attach = false
+  end
+
+  config.vm.define :node11 do |node|
+    node.vm.hostname = "node11.dev.wozitech.local"
+    node.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    node.vm.provider :libvirt do |domain|
+      domain.memory = 12288
+      domain.cpus = 4
+      # Specific storage for the database
+      domain.storage :file, :size => "10G", :type => "qcow2"
+    end
+
+    node.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/node11/node11.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    node.vm.post_up_message = "The node V10 server is up and running"
+  end
+
+end

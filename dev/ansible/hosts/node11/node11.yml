@@ -1,0 +1,26 @@
+# node11 host
+# https://hub.docker.com/_/postgres - postgreSQL docker image (latest)
+# https://hub.docker.com/_/node - node docker image, 10.14.2-alpine
+---
+- hosts: all
+  vars_files:
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
+
+  vars:
+    DISABLE_HOST_FIREWALL: true       # this is because firewall interfers with docker
+    DB_PORT: 5432
+    DB_USERNAME: postgres
+    DB_PASWORD: postres
+    DB_HOST_DIR: /var/lib/pgsql/11
+    DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
+    DB_CONTAINER_NAME: postgres
+
+  pre_tasks:
+    - import_tasks: tasks/network.yml
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+
+  roles:
+  tasks:
+    #- import_tasks: tasks/postgres.yml

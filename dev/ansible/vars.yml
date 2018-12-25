@@ -1,0 +1,8 @@
+network_gw: "192.160.100.2"      # gateway firewall
+netmask: "255.255.255.0"
+node11_ip: "192.168.100.100"
+root_domain: "wozitech-ltd.local"
+node11_hostname: "node11"
+node11_fqdn: "{{ node11_hostname }}.dev.{{ root_domain}}"
+#local_dns: "10.0.0.10"
+local_dns: "192.168.1.1"
