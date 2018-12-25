@@ -23,4 +23,4 @@
 
   roles:
   tasks:
-    #- import_tasks: tasks/postgres.yml
+    - import_tasks: tasks/postgres.yml

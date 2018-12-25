@@ -1,194 +1,119 @@
 # proxy nginx tasks
 ---
 
-- name: Ensure directory for local SSL certs exists
+- name: postgres group
   become: true
-  file:
-    path: "{{ SSL_CERTS_DIR }}"
-    state: directory
-    mode: 0750
-    owner: root
-    group: root
+  group:
+    name: "{{ item.groupname }}"
+    gid: "{{ item.gid }}"
+    state: present
+  with_items:
+    - { groupname: postgres, gid: 200 }
 
-- name: Ensure directory for target SSL certs exists for the target domain
+- name: Default users
   become: true
-  file:
-    path: "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}"
-    state: directory
-    mode: 0750
-    owner: root
-    group: root
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    uid: "{{ item.uid }}"
+    group: "{{ item.default_group }}"
+    groups: "{{ item.groups }}"
+    create_home: yes
+    append: no
+    generate_ssh_key: yes
+    state: present
+  with_items:
+    - { username: postgres, uid: 200, default_group: postgres, groups: '' }
 
-- name: Ensure directory for local html exists
+- name: Ensure base directory for postgres database
   become: true
   file:
-    path: "{{ HTML_DIR }}"
+    path: /var/lib/pgsql
     state: directory
     mode: 0755
     owner: root
     group: root
 
-- name: Ensure directory for local conf exists
+- name: Ensure directory for postgres database files exist
   become: true
   file:
-    path: "{{ CONF_CERTS_DIR }}"
+    path: /var/lib/pgsql/data
     state: directory
     mode: 0750
-    owner: root
-    group: root
+    owner: postgres
+    group: postgres
 
-- name: Ensure directory for local vhosts exists
-  become: true
-  file:
-    path: "{{ VHOSTS_CONF_DIR }}"
-    state: directory
-    mode: 0750
-    owner: root
-    group: root
-
-- name: Copy top level HTML placeholders
-  become: true
-  copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
-  with_items:
-    - index.html
-    - 50x.html
-  changed_when: false
-
-- name: Copy nginx conf
-  become: true
-  copy: src="../files/nginx.conf"  dest="{{ NGINX_BASE_DIR }}/nginx.conf"  mode=0644
-  changed_when: false
-
-- name: Copy default conf
-  become: true
-  copy: src="../files/default.conf"  dest="{{ VHOSTS_CONF_DIR }}/default.conf"  mode=0644
-  changed_when: false
-
-- name: Copy additional static confs
-  become: true
-  copy: src="../files/conf/{{ item }}"  dest="{{ CONF_CERTS_DIR }}"  mode=0644
-  with_items:
-    - fastcgi.conf
-    - mime.types
-    - proxy.conf
-  changed_when: false
-
-- name: Generate wiki reverse proxy conf
-  become: true
-  template: src="../templates/wiki-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI_CONF_FILE }}"  mode=0644
-  register: wiki_reverse_proxy
-
-- name: Generate default self signed SSL certificates
-  become: true
-  command: >
-    openssl req
-      -new
-      -newkey rsa:4096
-      -days 3650
-      -nodes
-      -x509
-      -subj "/C=US/ST=NY/L=NY/O=NA/CN={{ DEFAULT_DOMAIN_NAME }}"
-      -keyout "{{ SSL_CERTS_DIR }}/default.key"
-      -out "{{ SSL_CERTS_DIR }}/default.crt"
-  args:
-    creates: "{{ SSL_CERTS_DIR }}/default.crt"
-
-- name: Generate default wozitech virtual host domain self signed SSL certificates - only if certificates not already there
-  become: true
-  command: >
-    openssl req
-      -new
-      -newkey rsa:4096
-      -days 3650
-      -nodes
-      -x509
-      -subj "/C=US/ST=NY/L=NY/O=NA/CN={{ VIRTUAL_HOST_WIKI }}"
-      -keyout "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/privkey.pem"
-      -out "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/fullchain.pem"
-  args:
-    creates: "{{ SSL_CERTS_DIR }}/{{ wiki_external_domain }}/fullchain.pem"
-
-- name: Generate the dhparam.pem file
-  become: true
-  command: openssl dhparam -out "{{ DHPARAM_FILE }}" 2048
-  args:
-    creates: "{{ DHPARAM_FILE }}"
-
-- name: create the default nginx container
+- name: create the postgres container
   become: true
   docker_container:
-    name: "{{ NGINX_CONTAINER_NAME }}"
-    image: nginx
+    name: "{{ DB_CONTAINER_NAME }}"
+    image: postgres
     state: started
     detach: yes
-    volumes:
-      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
-      - "{{ HTML_DIR }}:/usr/share/nginx/html"
-      - "{{ CONF_CERTS_DIR }}:/etc/nginx/conf:ro"
-      - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d"
-      - "{{ NGINX_BASE_DIR }}/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "{{ ACME_CHALLENGE_DIR }}:/usr/share/nginx/html/acme"
+    # user: postgres
+    # groups:
+    #   postgres
+    # volumes:
+    #   - "/var/lib/pgsql/data:/var/lib/postgresql/data"
     ports:
-      - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
-      - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ SSL_PORT }}/tcp"
+      - "{{ node11_ip }}:5432:5432/tcp"
+    env:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
 
-- name: Enable nginx inbound on public zone (non-ssl)
-  become: true
-  firewalld:
-    state: enabled
-    zone: public
-    port: "{{ NON_SSL_PORT }}/tcp"
-    permanent: yes
-  register: nginx_non_ssl_firewalld
+# - name: Enable nginx inbound on public zone (non-ssl)
+#   become: true
+#   firewalld:
+#     state: enabled
+#     zone: public
+#     port: "{{ NON_SSL_PORT }}/tcp"
+#     permanent: yes
+#   register: nginx_non_ssl_firewalld
 
-- name: Enable nginx inbound on public zone (ssl)
-  become: true
-  firewalld:
-    state: enabled
-    zone: public
-    port: "{{ SSL_PORT }}/tcp"
-    permanent: yes
-  register: nginx_ssl_firewalld
+# - name: Enable nginx inbound on public zone (ssl)
+#   become: true
+#   firewalld:
+#     state: enabled
+#     zone: public
+#     port: "{{ SSL_PORT }}/tcp"
+#     permanent: yes
+#   register: nginx_ssl_firewalld
 
-- name: Restart firewall for changes to take effect
-  become: true
-  systemd:
-    name: firewalld
-    state: restarted
-  when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
+# - name: Restart firewall for changes to take effect
+#   become: true
+#   systemd:
+#     name: firewalld
+#     state: restarted
+#   when: nginx_non_ssl_firewalld.changed or nginx_ssl_firewalld.changed
 
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
-- name: Install nginx service
-  become: true
-  template:
-      src: ../templates/nginx.docker.service.j2
-      dest: /usr/lib/systemd/system/nginx.service
-      owner: root
-      group: root
-      mode: 0644
-  vars:
-    nginx_srv:
-      name: "{{  NGINX_CONTAINER_NAME }}"
-  register: nginx_service_install
+# # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
+# - name: Install nginx service
+#   become: true
+#   template:
+#       src: ../templates/nginx.docker.service.j2
+#       dest: /usr/lib/systemd/system/nginx.service
+#       owner: root
+#       group: root
+#       mode: 0644
+#   vars:
+#     nginx_srv:
+#       name: "{{  NGINX_CONTAINER_NAME }}"
+#   register: nginx_service_install
 
-- name: Enable and start nginx docker service
-  become: true
-  systemd:
-    name: "{{ NGINX_CONTAINER_NAME }}"
-    state: started
-    enabled: true
-    daemon_reload: yes
-  when: nginx_service_install.changed
+# - name: Enable and start nginx docker service
+#   become: true
+#   systemd:
+#     name: "{{ NGINX_CONTAINER_NAME }}"
+#     state: started
+#     enabled: true
+#     daemon_reload: yes
+#   when: nginx_service_install.changed
 
-- name: Restart nginx docker service
-  become: true
-  systemd:
-    name: "{{ NGINX_CONTAINER_NAME }}"
-    state: restarted
-  when:
-    - wiki_reverse_proxy.changed
-    - not nginx_service_install.changed
-
-
-
-  
+# - name: Restart nginx docker service
+#   become: true
+#   systemd:
+#     name: "{{ NGINX_CONTAINER_NAME }}"
+#     state: restarted
+#   when:
+#     - wiki_reverse_proxy.changed
+#     - not nginx_service_install.changed
