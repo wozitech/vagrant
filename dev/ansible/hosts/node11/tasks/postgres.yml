@@ -101,3 +101,16 @@
     enabled: true
     daemon_reload: yes
   when: postgres_service_install.changed
+
+# install the postgres client locally on the host
+- name: Setup the postgres repos
+  become: true
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-7-x86_64/pgdg-centos11-11-2.noarch.rpm
+    state: present
+
+- name: install just the postgres client
+  become: true
+  yum:
+    name: postgresql11
+    state: present
