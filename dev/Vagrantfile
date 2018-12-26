@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :node11 do |node|
     node.vm.hostname = "node11.dev.wozitech.local"
     node.vm.network :private_network,
-      libvirt__network_name: "DMZ"
+      libvirt__network_name: "devapp"
 
     node.vm.provider :libvirt do |domain|
       domain.memory = 12288

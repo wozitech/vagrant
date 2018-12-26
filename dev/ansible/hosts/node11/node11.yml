@@ -17,10 +17,10 @@
     DB_CONTAINER_NAME: postgres
 
   pre_tasks:
-    - import_tasks: tasks/network.yml
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+    #- import_tasks: tasks/network.yml
+    #- import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    # - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
 
   roles:
   tasks:
-    #- import_tasks: tasks/postgres.yml
+    - import_tasks: tasks/postgres.yml
