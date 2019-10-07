@@ -17,10 +17,9 @@
     - { name: nexus, ip: 10.0.0.31 }
     - { name: vault, ip: 10.0.0.32 }
     - { name: ldap, ip: 10.0.0.33 }
-    - { name: kctrl.dev, ip: 192.168.100.10 }
-    - { name: k1.dev, ip: 192.168.100.21 }
-    - { name: k2.dev, ip: 192.168.100.22}
-    - { name: node11.dev, ip: 192.168.100.11}
+    - { name: k8s-master.dev, ip: 192.168.100.10 }
+    - { name: k8s-worker1.dev, ip: 192.168.100.11 }
+    - { name: k8s-worker2.dev, ip: 192.168.100.12}
 
 - name: Enable DNS inbound on public zone
   become: true

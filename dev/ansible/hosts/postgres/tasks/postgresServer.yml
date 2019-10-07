@@ -1,0 +1,75 @@
+# local install of postgres server tasks
+---
+
+# - name: postgres group
+#   become: true
+#   group:
+#     name: "{{ item.groupname }}"
+#     gid: "{{ item.gid }}"
+#     state: present
+#   with_items:
+#     - { groupname: postgres, gid: 200 }
+
+# - name: Default users
+#   become: true
+#   user:
+#     name: "{{ item.username }}"
+#     shell: /bin/bash
+#     uid: "{{ item.uid }}"
+#     group: "{{ item.default_group }}"
+#     groups: "{{ item.groups }}"
+#     create_home: yes
+#     append: no
+#     generate_ssh_key: yes
+#     state: present
+#   with_items:
+#     - { username: postgres, uid: 200, default_group: postgres, groups: '' }
+
+# - name: Ensure base directory for postgres database
+#   become: true
+#   file:
+#     path: /var/lib/pgsql
+#     state: directory
+#     mode: 0755
+#     owner: root
+#     group: root
+
+# - name: Ensure directory for postgres database files exist
+#   become: true
+#   file:
+#     path: /var/lib/pgsql/data
+#     state: directory
+#     mode: 0750
+#     owner: postgres
+#     group: postgres
+
+- name: Enable postgres inbound on public zone
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "5432/tcp"
+    permanent: yes
+  register: postgres_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: postgres_firewalld.changed
+
+# install the postgres client locally on the host
+- name: Setup the postgres repos
+  become: true
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-7-x86_64/pgdg-centos11-11-2.noarch.rpm
+    state: present
+
+- name: install just the postgres client
+  become: true
+  yum:
+    name:
+        - postgresql11
+        - postgresql11-server
+    state: present

@@ -1,0 +1,28 @@
+# k8s-master host
+---
+- hosts: all
+  vars_files:
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
+
+  vars:
+    DISABLE_HOST_FIREWALL: true       # this is because firewall interfers with docker
+
+  pre_tasks:
+    - import_tasks: tasks/network.yml
+      vars:
+        host_ip: "{{ k8smaster_ip }}"
+        host_fqdn: "{{ k8smaster_fqdn}}"
+    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+
+  roles:
+  tasks:
+    - import_tasks: tasks/k8s-common.yml
+      vars:
+        k8s_hosts:
+          - { name: "{{ k8smaster_hostname }}", ip: "{{ k8smaster_ip }}", domain: "dev.{{ root_domain}}" }
+          - { name: "{{ k8sworker1_hostname }}", ip: "{{ k8sworker1_ip }}", domain: "dev.{{ root_domain}}" }
+          - { name: "{{ k8sworker2_hostname }}", ip: "{{ k8sworker2_ip }}", domain: "dev.{{ root_domain}}" }
+        this_host_ip: "{{ k8smaster_ip }}"
+    - import_tasks: tasks/k8s-master.yml

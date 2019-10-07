@@ -1,0 +1,59 @@
+# kubernetes cluster (k8s) - master configuration (continued from common)
+---
+- name: Initialise admin
+  become: true
+  shell: /usr/bin/kubeadm init > /home/kube/kubeadm_init.run 2>&1
+  args:
+    executable: /bin/bash
+    creates: /tmp/kubeadm_init.run
+  register: kubeadm_init_result
+  changed_when: false
+
+- name: kubeadm init results 
+  debug:
+    msg: "kubeadm: {{ kubeadm_init_result.stdout }}"
+  when: kubeadm_init_result.changed
+
+- name: Creates "kube" config directory
+  become: true
+  file:
+    path: /home/kube/.kube/
+    state: directory
+    mode: 0755
+    owner: kube
+    group: kube
+
+- name: Copy admin config to kube user
+  become: true
+  copy: remote_src=true src="/etc/kubernetes/{{ item }}"  dest="/home/kube/.kube/config"  mode=0600 force=no owner=kube group=kube
+  with_items:
+    - admin.conf
+  changed_when: false
+
+- name: helper to add workers to master
+  become: true
+  template: src=../templates/kube-worker-join-master.j2 dest=/home/kube/add_worker.sh owner=kube group=kube mode=0600
+
+- name: install weave CNI (container network interface) - this has to be run as the "kube" (non-root) user
+  become: true
+  become_user: kube
+  shell: /usr/bin/kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')" > /home/kube/kubectl-weave-cni.run 2>&1
+  args:
+    executable: /bin/bash
+    creates: /home/kube/kubeadm_init.run
+  register: kubectl_weave_result
+  changed_when: false
+
+- name: weave results
+  debug:
+    msg: "kubectl weave: {{ kubectl_weave_result.stdout }}"
+  when: kubectl_weave_result.changed
+
+- name: helper to add (join) workers to master
+  become: true
+  become_user: kube
+  shell: /usr/bin/kubeadm token create --print-join-command
+  register: kube_add_worker
+
+- name: save helper to local file to be used on workers!
+  local_action: copy content="{{ kube_add_worker.stdout_lines[0] }}" dest="files/kube-add-worker.sh"

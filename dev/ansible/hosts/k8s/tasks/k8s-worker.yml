@@ -1,0 +1,12 @@
+# kubernetes cluster (k8s) - worker configuration (continued from common)
+---
+
+- name: Copy the worker join command to worker
+  become: true
+  copy: src="files/kube-add-worker.sh" dest=/root/join-command.sh mode=0600
+
+- name: Join the node to cluster
+  become: true
+  shell: /bin/sh /root/join-command.sh > /root/kube-join.run
+  args:
+    creates: /root/kube-join.run

@@ -1,0 +1,117 @@
+# kubernetes cluster (k8s) - common configuration
+---
+
+- name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+  become: true
+  shell: |
+    /usr/sbin/swapoff -a
+
+- name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+  become: true
+  replace:
+    path: /etc/fstab
+    regexp: '^(.+?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
+
+- name: Disable SELinux
+  become: true
+  selinux:
+    state: disabled
+
+# firewalls are disabled because of docker - but firewall rules would otherwise be for a master
+# firewall-cmd –permanent –add-port=6443/tcp
+# firewall-cmd –permanent –add-port=2379-2380/tcp
+# firewall-cmd –permanent –add-port=10250/tcp
+# firewall-cmd –permanent –add-port=10251/tcp
+# firewall-cmd –permanent –add-port=10252/tcp
+# firewall-cmd –permanent –add-port=10255/tcp
+# firewall-cmd –reload
+
+# firewalls are disabled because of docker - but firewall rules would otherwise be for a worker
+# firewall-cmd –permanent –add-port=10250/tcp
+# firewall-cmd –permanent –add-port=10255/tcp
+# firewall-cmd –permanent –add-port=30000-32767/tcp
+# firewall-cmd –permanent –add-port=6783/tcp
+# firewall-cmd –reload
+
+# load br_netfilter and enable
+# modprobe br_netfilter
+# echo ‘1’ > /proc/sys/net/bridge/bridge-nf-call-iptables
+- name: Add the 802.1q module
+  become: true
+  modprobe:
+    name: 8021q
+    state: present
+
+- name: update br_netfilter kernel settings
+  become: true
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: "Build hosts file"
+  become: true
+  lineinfile: dest=/etc/hosts regexp='.*{{ item.name }}$' line="{{ item.ip }} {{ item.name }} {{ item.name }}.{{ item.domain }}" state=present
+  with_items: "{{ k8s_hosts }}"
+
+# add kubernetes repo
+- name: copy repo definition
+  become: true
+  copy: src="../files/{{ item }}"  dest="/etc/yum.repos.d"  mode="0644"
+  with_items:
+    - kubernetes.repo
+  changed_when: false         # TODO always reporting changed on every run; find out why.
+- name: Install kubernetes master runtime Dependencies
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+    disable_gpg_check:  "{{ item.disablegpgcheck }}"
+  with_items:
+    - { name: kubeadm, state: present, disablegpgcheck: yes }
+    - { name: kubectl, state: present, disablegpgcheck: yes }
+    - { name: kubelet, state: present, disablegpgcheck: yes }
+  when:
+    - ansible_pkg_mgr == "yum"
+
+- name: Configure kubelet host IP
+  become: true
+  lineinfile:
+    create: yes
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ this_host_ip }}
+
+
+- name: Default group
+  become: true
+  group:
+    name: "{{ item.groupname }}"
+    gid: "{{ item.gid }}"
+    state: present
+  with_items:
+    - { groupname: "kube", gid: 500 }
+
+- name: Default users
+  become: true
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    uid: "{{ item.uid }}"
+    group: "{{ item.default_group }}"
+    groups: "{{ item.groups }}"
+    create_home: yes
+    append: no
+    generate_ssh_key: yes
+    state: present
+  with_items:
+    - { username: "kube", uid: 500, default_group: "kube", groups: "" }
+
+- name: Enable kubelet
+  become: true
+  systemd:
+    name: kubelet
+    state: started
+    enabled: true
