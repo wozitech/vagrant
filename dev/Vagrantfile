@@ -42,27 +42,6 @@ Vagrant.configure("2") do |config|
     postgres.vm.post_up_message = "The node V10 server is up and running"
   end
 
-  # config.vm.define :node11 do |node|
-  #   node.vm.hostname = "node11.dev.wozitech.local"
-  #   node.vm.network :private_network,
-  #     libvirt__network_name: "devapp"
-
-  #   node.vm.provider :libvirt do |domain|
-  #     domain.memory = 12288
-  #     domain.cpus = 4
-  #     # Specific storage for the database
-  #     domain.storage :file, :size => "10G", :type => "qcow2"
-  #   end
-
-  #   node.vm.provision "ansible" do |ansible|
-  #      ansible.playbook = "ansible/hosts/node11/node11.yml"
-  #      ansible.compatibility_mode = "2.0"
-  #      ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
-  #   end
-
-  #   node.vm.post_up_message = "The node V10 server is up and running"
-  # end
-
   config.vm.define "k8s-master" do |master|
     master.vm.hostname = "k8s-master.dev.wozitech.local"
     master.vm.network "private_network", libvirt__network_name: "devapp"
