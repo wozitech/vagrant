@@ -13,7 +13,7 @@ To run with debug:
 `ANSIBLE_ARGS='-vvv --extra-vars "os_update=1"' vagrant [provision|up] <name of host>`
 
 # Dependencies
-ansigle galazy roles:
+ansible galazy roles:
 * bertvv.dnsmasq
 * ansible-thoteam.nexus3-oss, which depends upon:
     *  ansiblebit.oracle-java
