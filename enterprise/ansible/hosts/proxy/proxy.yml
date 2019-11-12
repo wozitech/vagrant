@@ -24,6 +24,7 @@
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
+    REMOTE_NEXUS_URI: "http://{{ nexus_ip }}:8081"
     LETENCYRPT_ADMIN_EMAIL: admin@wozitech-ltd.co.uk
     dnsmasq_domain: "{{ root_domain }}"
     dnsmasq_listen_address: "{{ forward_proxy_ip }}"
