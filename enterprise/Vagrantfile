@@ -71,7 +71,7 @@ Vagrant.configure("2") do |config|
        ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
     end
 
-    web.vm.post_up_message = "The Extranet web server is up and running"
+    web2.vm.post_up_message = "The Extranet web server is up and running"
   end
 
   config.vm.define :nexus do |nexus|
