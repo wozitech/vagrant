@@ -56,6 +56,24 @@ Vagrant.configure("2") do |config|
     web.vm.post_up_message = "The Extranet web server is up and running"
   end
 
+  config.vm.define :web2 do |web2|
+    web2.vm.hostname = "web2.wozitech.local"
+    web2.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    web2.vm.provider :libvirt do |domain|
+      domain.memory = 8192
+    end
+
+    web2.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/web2/web2.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    web.vm.post_up_message = "The Extranet web server is up and running"
+  end
+
   config.vm.define :nexus do |nexus|
     nexus.vm.hostname = "nexus.wozitech.local"
     nexus.vm.network :private_network,

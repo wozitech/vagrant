@@ -131,6 +131,7 @@
     ports:
       - "{{ forward_proxy_ip }}:{{ NON_SSL_PORT }}:{{ NON_SSL_PORT }}/tcp"
       - "{{ forward_proxy_ip }}:{{ SSL_PORT }}:{{ SSL_PORT }}/tcp"
+      - "{{ forward_proxy_ip }}:{{ NEXUS_SSL_PORT }}:{{ NEXUS_SSL_PORT }}/tcp"
 
 - name: Enable nginx inbound on public zone (non-ssl)
   become: true
@@ -149,6 +150,15 @@
     port: "{{ SSL_PORT }}/tcp"
     permanent: yes
   register: nginx_ssl_firewalld
+
+- name: Enable nginx nexus proxy inbound on public zone (ssl)
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ NEXUS_SSL_PORT }}/tcp"
+    permanent: yes
+  register: nginx_nexus_firewalld
 
 - name: Restart firewall for changes to take effect
   become: true

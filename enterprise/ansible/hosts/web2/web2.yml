@@ -1,0 +1,23 @@
+---
+- hosts: all
+  vars_files:
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
+    - vars/wiki.js.yml
+    - vars/nvm.yml
+
+  vars:
+    wiki_external_url: "https://{{ wiki_external_domain }}"
+    WIKI_PORT: 3000
+    WIKI_CONTAINER_NAME: wikijs
+    CMS_PORT: 1337
+    CMS_CONTAINER_NAME: wozitech-cmd
+
+  # pre_tasks:
+     - import_tasks: tasks/network.yml
+     - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+     - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+
+  tasks:
+    #- import_tasks: tasks/wikijs.yml
+    #- import_tasks: tasks/wozitech-cms.yml

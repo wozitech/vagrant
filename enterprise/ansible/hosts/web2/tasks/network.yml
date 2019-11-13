@@ -1,12 +1,12 @@
 # network tasks
 ---
-- name: Setup local network (eth1)
+- name: Setup local network
   become: true
   template: src=../../../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth1
   vars:
     ipinterface:
       ifname: eth1
-      ip: "{{ nexus_ip }}"
+      ip: "{{ webserver_ip }}"
       gateway: "{{ network_gw }}"
       dns: "{{ local_dns }}"
       netmask: "{{ netmask }}"
@@ -42,8 +42,8 @@
 
 - name: Set fully qualified hostname
   become: true
-  shell: hostnamectl set-hostname "{{ nexus_fqdn }}"
-  when: this_hostname.stdout != nexus_fqdn
+  shell: hostnamectl set-hostname "{{ webserver_fqdn }}"
+  when: this_hostname.stdout != webserver_fqdn
 - name: Get fully qualified hostname
   become: true
   shell: hostname
@@ -53,34 +53,4 @@
   debug:
     msg: "New hostname: {{ this_hostname.stdout }}"
 
-- name: Enable nexus inbound on public zone
-  become: true
-  firewalld:
-    state: enabled
-    zone: public
-    port: "{{ NEXUS_PORT }}/tcp"
-    permanent: yes
-  register: nexus_firewalld
 
-- name: Enable nexus docker proxy repo inbound on public zone
-  become: true
-  firewalld:
-    state: enabled
-    zone: public
-    port: "{{ NEXUS_DOCKER_PROXY_PORT }}/tcp"
-    permanent: yes
-
-- name: Enable nexus docker hosted repo inbound on public zone
-  become: true
-  firewalld:
-    state: enabled
-    zone: public
-    port: "{{ NEXUS_DOCKER_HOST_PORT }}/tcp"
-    permanent: yes
-
-- name: Restart firewall for changes to take effect
-  become: true
-  systemd:
-    name: firewalld
-    state: restarted
-  when: nexus_firewalld.changed
