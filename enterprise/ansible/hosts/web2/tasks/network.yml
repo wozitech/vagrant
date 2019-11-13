@@ -6,7 +6,7 @@
   vars:
     ipinterface:
       ifname: eth1
-      ip: "{{ webserver_ip }}"
+      ip: "{{ webserver2_ip }}"
       gateway: "{{ network_gw }}"
       dns: "{{ local_dns }}"
       netmask: "{{ netmask }}"
@@ -42,8 +42,8 @@
 
 - name: Set fully qualified hostname
   become: true
-  shell: hostnamectl set-hostname "{{ webserver_fqdn }}"
-  when: this_hostname.stdout != webserver_fqdn
+  shell: hostnamectl set-hostname "{{ webserver2_fqdn }}"
+  when: this_hostname.stdout != webserver2_fqdn
 - name: Get fully qualified hostname
   become: true
   shell: hostname
