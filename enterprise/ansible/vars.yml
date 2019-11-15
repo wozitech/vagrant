@@ -22,6 +22,6 @@ root_dns: "192.168.1.1"
 local_dns: "{{ forward_proxy_ip }}"
 
 wiki_external_domain: wozitech.asuscomm.com
-wiki2_external_domain: wiki.wozitech.myddns.rocks
+wikitwo_external_domain: wiki.wozitech.myddns.rocks
 nexus_external_domain: nexus.wozitech.myddns.rocks
 cms_external_domain: cms.wozitech.myddns.rocks
