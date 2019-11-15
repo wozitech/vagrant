@@ -11,7 +11,6 @@
     DISABLE_HOST_FIREWALL: true
     NON_SSL_PORT: 80
     SSL_PORT: 443
-    NEXUS_SSL_PORT: 4431
     NGINX_BASE_DIR: /etc/nginx
     SSL_CERTS_DIR: "{{ NGINX_BASE_DIR }}/certs"
     CONF_CERTS_DIR: "{{ NGINX_BASE_DIR }}/conf"
@@ -22,6 +21,9 @@
     NGINX_CONTAINER_NAME: nginx
     LETSENCRYPT_CONTAINER_NAME: letsencrypt
     VIRTUAL_HOST_WIKI: "{{ wiki_external_domain }}"
+    VIRTUAL_HOST_WIKI2: "{{ wiki2_external_domain }}"
+    VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
+    VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
