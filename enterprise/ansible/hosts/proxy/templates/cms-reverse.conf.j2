@@ -1,8 +1,8 @@
 
 server {
-    server_name {{ VIRTUAL_HOST_NEXUS }};
+    server_name {{ VIRTUAL_HOST_CMS }};
     listen {{ NON_SSL_PORT }};
-    access_log /var/log/nginx/nexus_access.log vhost;
+    access_log /var/log/nginx/cms_access.log vhost;
 
     # Let's Encrypt override
     location /.well-known/acme-challenge {
@@ -24,9 +24,9 @@ server {
 }
 
 server {
-      server_name {{ VIRTUAL_HOST_NEXUS }};
+      server_name {{ VIRTUAL_HOST_CMS }};
       listen {{ SSL_PORT }} ssl http2;
-      access_log /var/log/nginx/nexus_access.log vhost;
+      access_log /var/log/nginx/cms_access.log vhost;
 
       ssl_session_tickets off;
       ssl_session_timeout 1d;
@@ -36,14 +36,16 @@ server {
       ssl_ciphers "EECDH+ECDSA+AESGCM EECDH+aRSA+AESGCM EECDH+ECDSA+SHA384 EECDH+ECDSA+SHA256 EECDH+aRSA+SHA384 EECDH+aRSA+SHA256 EECDH EDH+aRSA !RC4 !aNULL !eNULL !LOW !3DES !MD5 !EXP !PSK !SRP !DSS";
       ssl_prefer_server_ciphers on;
 
-      ssl_certificate /etc/nginx/certs//{{ nexus_external_domain }}/fullchain.pem;
-      ssl_certificate_key /etc/nginx/certs/{{ nexus_external_domain }}/privkey.pem;
+      ssl_certificate /etc/nginx/certs//{{ cms_external_domain }}/fullchain.pem;
+      ssl_certificate_key /etc/nginx/certs/{{ cms_external_domain }}/privkey.pem;
 
       location / {
-        proxy_pass {{ REMOTE_NEXUS_URI }};
-        proxy_set_header Host $host;
+        proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto "https";
+        proxy_pass {{ REMOTE_CMS_URI }};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_next_upstream error timeout http_502 http_503 http_504;
       }
 }

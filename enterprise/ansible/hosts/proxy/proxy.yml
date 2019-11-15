@@ -26,9 +26,13 @@
     VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     NGINX_PROXY_NEXUS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_NEXUS }}.conf"
+    NGINX_PROXY_WIKI2_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI2 }}.conf"
+    NGINX_PROXY_CMS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_CMS }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
+    REMOTE_WIKI2_URI: "http://{{ webserver2_ip }}:8081"
     REMOTE_NEXUS_URI: "http://{{ nexus_ip }}:8081"
+    REMOTE_CMS_URI: "http://{{ webserver2_ip }}:8080"
     LETENCYRPT_ADMIN_EMAIL: admin@wozitech-ltd.co.uk
     dnsmasq_domain: "{{ root_domain }}"
     dnsmasq_listen_address: "{{ forward_proxy_ip }}"

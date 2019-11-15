@@ -81,7 +81,17 @@
 - name: Generate nexus reverse proxy conf
   become: true
   template: src="../templates/nexus-reverse.conf.j2"  dest="{{ NGINX_PROXY_NEXUS_CONF_FILE }}"  mode=0644
-  register: nginx_reverse_proxy
+  register: nexus_reverse_proxy
+
+- name: Generate wiki2 reverse proxy conf
+  become: true
+  template: src="../templates/wiki-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI2_CONF_FILE }}"  mode=0644
+  register: wiki2_reverse_proxy
+
+- name: Generate CMS reverse proxy conf
+  become: true
+  template: src="../templates/cms-reverse.conf.j2"  dest="{{ NGINX_PROXY_CMS_CONF_FILE }}"  mode=0644
+  register: cms_reverse_proxy
 
 - name: Generate default self signed SSL certificates
   become: true
@@ -192,6 +202,7 @@
     state: restarted
   when:
     - wiki_reverse_proxy.changed
-    - nginx_reverse_proxy.changed
+    - nexus_reverse_proxy.changed
+    - wiki2_reverse_proxy.changed
+    - cms_reverse_proxy.changed
     - not nginx_service_install.changed
-  
