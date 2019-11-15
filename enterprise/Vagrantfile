@@ -57,6 +57,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define :web2 do |web2|
+    web2.vm.box = "centos/8"
     web2.vm.hostname = "web2.wozitech.local"
     web2.vm.network :private_network,
       libvirt__network_name: "DMZ"
