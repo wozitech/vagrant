@@ -85,7 +85,7 @@
 
 - name: Generate wiki2 reverse proxy conf
   become: true
-  template: src="../templates/wiki-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI2_CONF_FILE }}"  mode=0644
+  template: src="../templates/wiki2-reverse.conf.j2"  dest="{{ NGINX_PROXY_WIKI2_CONF_FILE }}"  mode=0644
   register: wiki2_reverse_proxy
 
 - name: Generate CMS reverse proxy conf

@@ -21,7 +21,7 @@
     NGINX_CONTAINER_NAME: nginx
     LETSENCRYPT_CONTAINER_NAME: letsencrypt
     VIRTUAL_HOST_WIKI: "{{ wiki_external_domain }}"
-    VIRTUAL_HOST_WIKI2: "{{ wikitwo_external_domain }}"
+    VIRTUAL_HOST_WIKI_TWO: "{{ wikitwo_external_domain }}"
     VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
     VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
