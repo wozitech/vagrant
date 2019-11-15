@@ -25,6 +25,7 @@
     VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
     VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
+    NGINX_PROXY_NEXUS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_NEXUS }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
     REMOTE_NEXUS_URI: "http://{{ nexus_ip }}:8081"
@@ -51,7 +52,7 @@
   #   - { role: bertvv.dnsmasq, become: yes }
 
   tasks:
-    - import_tasks: tasks/nginx.yml
+    # - import_tasks: tasks/nginx.yml
     # temporarily disable letencrypt config
     #- import_tasks: tasks/letsencrypt.yml
 
