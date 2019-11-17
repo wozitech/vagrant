@@ -142,8 +142,8 @@
     state: started
     detach: yes
     volumes:
-      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"default_reverse_proxy
-      - "{{ HTML_DIR }}:/usr/share/nginx/html"default_reverse_proxy
+      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
+      - "{{ HTML_DIR }}:/usr/share/nginx/html"
       - "{{ CONF_CERTS_DIR }}:/etc/nginx/conf:ro"
       - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d"
       - "{{ NGINX_BASE_DIR }}/nginx.conf:/etc/nginx/nginx.conf:ro"
