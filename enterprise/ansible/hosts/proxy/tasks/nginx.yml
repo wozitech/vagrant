@@ -93,6 +93,11 @@
   template: src="../templates/cms-reverse.conf.j2"  dest="{{ NGINX_PROXY_CMS_CONF_FILE }}"  mode=0644
   register: cms_reverse_proxy
 
+- name: Generate default reverse proxy conf
+  become: true
+  template: src="../templates/default-reverse.conf.j2"  dest="{{ NGINX_PROXY_CMS_CONF_FILE }}"  mode=0644
+  register: default_reverse_proxy
+
 - name: Generate default self signed SSL certificates
   become: true
   command: >
@@ -137,8 +142,8 @@
     state: started
     detach: yes
     volumes:
-      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
-      - "{{ HTML_DIR }}:/usr/share/nginx/html"
+      - "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"default_reverse_proxy
+      - "{{ HTML_DIR }}:/usr/share/nginx/html"default_reverse_proxy
       - "{{ CONF_CERTS_DIR }}:/etc/nginx/conf:ro"
       - "{{ VHOSTS_CONF_DIR }}:/etc/nginx/conf.d"
       - "{{ NGINX_BASE_DIR }}/nginx.conf:/etc/nginx/nginx.conf:ro"
@@ -205,4 +210,5 @@
     - nexus_reverse_proxy.changed
     - wiki2_reverse_proxy.changed
     - cms_reverse_proxy.changed
+    - default_reverse_proxy.changed
     - not nginx_service_install.changed

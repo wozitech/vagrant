@@ -19,7 +19,8 @@
     VHOSTS_CONF_DIR: "{{ NGINX_BASE_DIR }}/conf.d"
     DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
     NGINX_CONTAINER_NAME: nginx
-    LETSENCRYPT_DEFAULT_CONTAINER_NAME: letsencrypt
+    LETSENCRYPT_CONTAINER_NAME: letsencrypt
+    LETSENCRYPT_DEFAULT_CONTAINER_NAME: defaultletsencrypt
     LETSENCRYPT_WIKI_CONTAINER_NAME: wikiletsencrypt
     LETSENCRYPT_NEXUS_CONTAINER_NAME: nexusletsencrypt
     LETSENCRYPT_CMS_CONTAINER_NAME: cmsletsencrypt
@@ -27,6 +28,7 @@
     VIRTUAL_HOST_WIKI_TWO: "{{ wikitwo_external_domain }}"
     VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
     VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
+    VIRTUAL_HOST_DEFAULT: "{{ default_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     NGINX_PROXY_NEXUS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_NEXUS }}.conf"
     NGINX_PROXY_WIKI2_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI_TWO }}.conf"
@@ -59,9 +61,8 @@
   #   - { role: bertvv.dnsmasq, become: yes }
 
   tasks:
-    # - import_tasks: tasks/nginx.yml
-    # temporarily disable letencrypt config
-    #- import_tasks: tasks/letsencrypt.yml
+    - import_tasks: tasks/nginx.yml
+    - import_tasks: tasks/letsencrypt.yml
     #- import_tasks: tasks/letsencrypt-wiki.yml
     #- import_tasks: tasks/letsencrypt-nexus.yml
     #- import_tasks: tasks/letsencrypt-cms.yml
