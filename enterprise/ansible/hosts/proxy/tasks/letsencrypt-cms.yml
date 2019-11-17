@@ -1,0 +1,65 @@
+# proxy Let's Encrypt tasks
+---
+
+- name: Ensure directory for target SSL certs exists for the target domain
+  become: true
+  file:
+    path: "{{ SSL_CERTS_DIR }}/{{ cms_external_domain }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
+- name: Create directory for local Let's Encrypt config and working data
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+  with_items:
+    - /etc/letsencrypt-cms
+    - /var/lib/letsencrypt-cms
+
+- name: create the cms LetsEncrypt container
+  become: true
+  docker_container:
+    name: "{{ LETSENCRYPT_CMS_CONTAINER_NAME }}"
+    image: gordonchan/auto-letsencrypt
+    state: started
+    detach: yes
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ SSL_CERTS_DIR }}/{{ cms_external_domain }}:/etc/nginx/certs"
+      - /etc/letsencrypt-cms:/etc/letsencrypt
+      - /var/lib/letsencrypt-cms:/var/lib/letsencrypt
+      - "{{ ACME_CHALLENGE_DIR }}:/var/www"
+    env:
+      EMAIL: "{{ LETENCYRPT_ADMIN_EMAIL }}"
+      DOMAINS: "{{ cms_external_domain }}"
+      CERTS_PATH: /etc/nginx/certs
+      SERVER_CONTAINER: "{{ NGINX_CONTAINER_NAME }}"
+
+- name: Install letsencrypt service
+  become: true
+  template:
+      src: ../templates/letsencrypt.docker.service.j2
+      dest: "/usr/lib/systemd/system/{{ LETSENCRYPT_CMS_CONTAINER_NAME }}.service"
+      owner: root
+      group: root
+      mode: 0644
+  vars:
+    srv:
+      name: "{{  LETSENCRYPT_CMS_CONTAINER_NAME }}"
+  register: letsencrypt_service_install
+
+- name: Enable and start letsencrypt docker service
+  become: true
+  systemd:
+    name: "{{ LETSENCRYPT_CMS_CONTAINER_NAME }}"
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: letsencrypt_service_install.changed
+

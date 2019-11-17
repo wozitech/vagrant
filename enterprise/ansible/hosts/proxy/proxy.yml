@@ -59,9 +59,10 @@
   #   - { role: bertvv.dnsmasq, become: yes }
 
   tasks:
-    - import_tasks: tasks/nginx.yml
+    #- import_tasks: tasks/nginx.yml
     # temporarily disable letencrypt config
     #- import_tasks: tasks/letsencrypt.yml
     #- import_tasks: tasks/letsencrypt-wiki.yml
-    - import_tasks: tasks/letsencrypt-nexus.yml
+    #- import_tasks: tasks/letsencrypt-nexus.yml
+    - import_tasks: tasks/letsencrypt-cms.yml
 
