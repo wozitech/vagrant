@@ -25,3 +25,4 @@ wiki_external_domain: wozitech.asuscomm.com
 wikitwo_external_domain: wiki.wozitech.myddns.rocks
 nexus_external_domain: nexus.wozitech.myddns.rocks
 cms_external_domain: cms.wozitech.myddns.rocks
+default_external_domain: wozitech.myddns.rocks
