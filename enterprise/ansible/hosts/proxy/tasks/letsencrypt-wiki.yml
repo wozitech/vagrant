@@ -45,7 +45,7 @@
   become: true
   template:
       src: ../templates/letsencrypt.docker.service.j2
-      dest: "/usr/lib/systemd/system/{{ name }}.service"
+      dest: "/usr/lib/systemd/system/{{ LETSENCRYPT_WIKI_CONTAINER_NAME }}.service"
       owner: root
       group: root
       mode: 0644
@@ -61,5 +61,5 @@
     state: started
     enabled: true
     daemon_reload: yes
-  when: letsencrypt_service_install.changed
+  #when: letsencrypt_service_install.changed
 
