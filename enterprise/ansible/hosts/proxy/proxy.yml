@@ -19,7 +19,10 @@
     VHOSTS_CONF_DIR: "{{ NGINX_BASE_DIR }}/conf.d"
     DEFAULT_DOMAIN_NAME: "{{ proxy_fqdn }}"
     NGINX_CONTAINER_NAME: nginx
-    LETSENCRYPT_CONTAINER_NAME: letsencrypt
+    LETSENCRYPT_DEFAULT_CONTAINER_NAME: letsencrypt
+    LETSENCRYPT_WIKI_CONTAINER_NAME: wikiletsencrypt
+    LETSENCRYPT_NEXUS_CONTAINER_NAME: nexusletsencrypt
+    LETSENCRYPT_CMS_CONTAINER_NAME: cmsletsencrypt
     VIRTUAL_HOST_WIKI: "{{ wiki_external_domain }}"
     VIRTUAL_HOST_WIKI_TWO: "{{ wikitwo_external_domain }}"
     VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
@@ -59,4 +62,5 @@
     - import_tasks: tasks/nginx.yml
     # temporarily disable letencrypt config
     # - import_tasks: tasks/letsencrypt.yml
+    - import_tasks: tasks/letsencrypt-wiki.yml
 
