@@ -37,7 +37,7 @@
       - "{{ ACME_CHALLENGE_DIR }}:/var/www"
     env:
       EMAIL: "{{ LETENCYRPT_ADMIN_EMAIL }}"
-      DOMAINS: "{{ default_external_domain }}"
+      DOMAINS: "{{ default_external_domain }} www.{{ default_external_domain }}"
       CERTS_PATH: /etc/nginx/certs
       SERVER_CONTAINER: "{{ NGINX_CONTAINER_NAME }}"
 
