@@ -45,7 +45,7 @@
   become: true
   template:
       src: ../templates/letsencrypt.docker.service.j2
-      dest: /usr/lib/systemd/system/letsencrypt.service
+      dest: "/usr/lib/systemd/system/{{ name }}.service"
       owner: root
       group: root
       mode: 0644
