@@ -25,7 +25,7 @@
 - name: create the default LetsEncrypt container
   become: true
   docker_container:
-    name: "{{ LETSENCRYPT_CMS_CONTAINER_NAME }}"
+    name: "{{ LETSENCRYPT_DEFAULT_CONTAINER_NAME }}"
     image: gordonchan/auto-letsencrypt
     state: started
     detach: yes
@@ -45,19 +45,19 @@
   become: true
   template:
       src: ../templates/letsencrypt.docker.service.j2
-      dest: "/usr/lib/systemd/system/{{ LETSENCRYPT_CMS_CONTAINER_NAME }}.service"
+      dest: "/usr/lib/systemd/system/{{ LETSENCRYPT_DEFAULT_CONTAINER_NAME }}.service"
       owner: root
       group: root
       mode: 0644
   vars:
     srv:
-      name: "{{  LETSENCRYPT_CMS_CONTAINER_NAME }}"
+      name: "{{  LETSENCRYPT_DEFAULT_CONTAINER_NAME }}"
   register: letsencrypt_service_install
 
 - name: Enable and start letsencrypt docker service
   become: true
   systemd:
-    name: "{{ LETSENCRYPT_CMS_CONTAINER_NAME }}"
+    name: "{{ LETSENCRYPT_DEFAULT_CONTAINER_NAME }}"
     state: started
     enabled: true
     daemon_reload: yes
