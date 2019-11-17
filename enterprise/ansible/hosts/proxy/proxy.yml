@@ -33,6 +33,7 @@
     NGINX_PROXY_NEXUS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_NEXUS }}.conf"
     NGINX_PROXY_WIKI2_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI_TWO }}.conf"
     NGINX_PROXY_CMS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_CMS }}.conf"
+    NGINX_PROXY_DEFAULT_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_DEFAULT }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
     REMOTE_WIKI2_URI: "http://{{ webserver2_ip }}:8081"
@@ -66,5 +67,5 @@
     #- import_tasks: tasks/letsencrypt-wiki.yml
     #- import_tasks: tasks/letsencrypt-nexus.yml
     #- import_tasks: tasks/letsencrypt-cms.yml
-    - import_tasks: tasks/letsencrypt-default.yml
+    #- import_tasks: tasks/letsencrypt-default.yml
 
