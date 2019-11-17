@@ -95,7 +95,7 @@
 
 - name: Generate default reverse proxy conf
   become: true
-  template: src="../templates/default-reverse.conf.j2"  dest="{{ NGINX_PROXY_CMS_CONF_FILE }}"  mode=0644
+  template: src="../templates/default-reverse.conf.j2"  dest="{{ NGINX_PROXY_DEFAULT_CONF_FILE }}"  mode=0644
   register: default_reverse_proxy
 
 - name: Generate default self signed SSL certificates
