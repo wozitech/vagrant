@@ -31,7 +31,7 @@
 
     - role: ansible-thoteam.nexus3-oss
       become: yes
-      nexus_version: '3.14.0-04'
+      #nexus_version: '3.14.0-04'
       nexus_timezone: 'Europe/London'
       nexus_download_url: "http://download.sonatype.com/nexus/3"
       nexus_download_dir: /tmp
@@ -42,10 +42,10 @@
       nexus_installation_dir: /opt
       nexus_data_dir: "{{ lvm_mount }}"
       nexus_tmp_dir: /tmp/nexus
-      nexus_min_heap_size: "1200M"
+      nexus_min_heap_size: "2400M"
       nexus_max_heap_size: "{{ nexus_min_heap_size }}"
       nexus_max_direct_memory: "2G"
-      nexus_admin_password: 'changeme'
+      #nexus_admin_password: 'changeme'
       nexus_anonymous_access: true
       public_hostname: "{{ nexus_fqdn }}"
       nexus_branding_header: "WOZiTech Nexus3"
