@@ -18,7 +18,26 @@
     state: restarted
   when: wiki_port_firewalld.changed
 
-- name: Login to the nexus docker repo
+- name: Ensure directory for wikijs data
+  become: true
+  file:
+    path: "{{ WIKI_LOCAL_DATA }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
+- name: Ensure directory for wikijs postgres data
+  become: true
+  file:
+    path: "{{ WIKI_LOCAL_POSTGRES_DATA }}"
+    state: directory
+    mode: 0750
+    owner: root
+    group: root
+
+
+- name: Login to the nexus docker proxy repo
   become: true
   docker_login:
     registry: "http://{{ wozitech_nexus_proxy }}"
@@ -31,6 +50,30 @@
     name: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
     tag: latest
 
+- name: Pull the wiki's postgres docker image
+  become: true
+  docker_image:
+    name: "{{ wozitech_nexus_proxy }}/{{ WIKI_POSTGRES_DOCKER_IMAGE }}"
+    tag: latest
+
+
+# note - the postgres container has no exposed port mapping, thus is not available
+#        outside of docker, and thus the username/password for the wiki schema is not sensitive
+#        and hence included here
+- name: create the postgres container
+  become: true
+  docker_container:
+    name: "{{ WIKI_POSTGRES_CONTAINER_NAME }}"
+    image: "{{ wozitech_nexus_proxy }}/{{ WIKI_POSTGRES_DOCKER_IMAGE }}"
+    state: started
+    detach: yes
+    volumes:
+      - "{{ WIKI_LOCAL_POSTGRES_DATA }}:/var/lib/postgresql/data"
+    env:
+        POSTGRES_DB: wiki
+        POSTGRES_PASSWORD: wikijsrocks
+        POSTGRES_USER: wikijs
+
 - name: create the wikijs container
   become: true
   docker_container:
@@ -38,12 +81,19 @@
     image: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
     state: started
     detach: yes
+    links:
+      - "{{ WIKI_POSTGRES_CONTAINER_NAME }}:db"
     volumes:
-      #- "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
+      - "{{ WIKI_LOCAL_DATA }}:/wiki/data"
     ports:
       - "8081:{{ WIKI_PORT }}/tcp"
     env:
-        DB_TYPE: sqlite
+        DB_TYPE: postgres
+        DB_HOST: db
+        DB_PORT: 5432
+        DB_USER: wikijs
+        DB_PASS: wikijsrocks
+        DB_NAME: wiki
 
 # # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
 # - name: Install wikijs service
