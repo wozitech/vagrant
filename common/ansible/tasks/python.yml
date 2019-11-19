@@ -8,7 +8,7 @@
 
 - name: Install Python2
   become: true
-  raw: dnf -y install python2
+  raw: dnf -y install python2 libselinux-python
   when: check_python.rc != 0
 
 - name: Set Python2 as default
