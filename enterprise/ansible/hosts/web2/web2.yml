@@ -1,6 +1,5 @@
 ---
 - hosts: all
-  gather_facts: no
   vars_files:
     - ../../../../common/ansible/vars/centosVars.yml
     - ../../vars.yml
