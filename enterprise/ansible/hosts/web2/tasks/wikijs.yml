@@ -31,17 +31,17 @@
     name: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
     tag: latest
 
-# - name: create the wikijs container
-#   become: true
-#   docker_container:
-#     name: "{{ WIKI_CONTAINER_NAME }}"
-#     image: "{{ WIKI_DOCKER_IMAGE }}"
-#     state: started
-#     detach: yes
-#     volumes:
-#       #- "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
-#     ports:
-#       - "8081:{{ CMS_PORT }}/tcp"
+- name: create the wikijs container
+  become: true
+  docker_container:
+    name: "{{ WIKI_CONTAINER_NAME }}"
+    image: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
+    state: started
+    detach: yes
+    volumes:
+      #- "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
+    ports:
+      - "8081:{{ CMS_PORT }}/tcp"
 
 
 # # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
