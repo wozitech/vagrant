@@ -41,7 +41,7 @@
     volumes:
       #- "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
     ports:
-      - "8081:{{ CMS_PORT }}/tcp"
+      - "8081:{{ WIKI_PORT }}/tcp"
     env:
         DB_TYPE: sqlite
 
