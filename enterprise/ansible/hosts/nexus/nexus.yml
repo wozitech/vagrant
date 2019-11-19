@@ -29,6 +29,7 @@
       oracle_java_set_as_default: no
       oracle_java_version_string: 1.8.0_191
 
+    # upgrade nexus
     - role: ansible-thoteam.nexus3-oss
       become: yes
       nexus_upgrade: true
