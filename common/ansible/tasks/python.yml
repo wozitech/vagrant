@@ -7,7 +7,5 @@
   register: check_python
 
 - name: Install Python
-  raw: dnf -y install python
+  raw: dnf -y install python2
   when: check_python.rc != 0
-
-  
