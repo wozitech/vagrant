@@ -25,7 +25,7 @@
   file:
     path: "{{ WIKI_LOCAL_DATA }}"
     state: directory
-    mode: 0750
+    mode: 0777
     owner: vagrant
     group: vagrant
 
@@ -34,7 +34,7 @@
   file:
     path: "{{ WIKI_LOCAL_POSTGRES_DATA }}"
     state: directory
-    mode: 0750
+    mode: 0777
     owner: root
     group: root
 
