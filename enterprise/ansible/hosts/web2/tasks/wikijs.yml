@@ -18,35 +18,16 @@
     state: restarted
   when: wiki_port_firewalld.changed
 
-# the wikijs docker image runs under a 'none' user:group with UID/GID of 1000
-- name: wikijs user
-  become: true
-  group:
-    name: node
-    gid: 1000
-    state: present
-
-- name: wikijs iser
-  become: true
-  user:
-    name: node
-    shell: /sbin/nologin
-    uid: 1000
-    group: node
-    #groups: "{{ item.groups }}"
-    create_home: no
-    append: no
-    generate_ssh_key: no
-    state: present
-
+# the wikijs docker image runs under a 'node' user:group with UID/GID of 1000
+#  but 1000 is already used by vagrant on the host
 - name: Ensure directory for wikijs data
   become: true
   file:
     path: "{{ WIKI_LOCAL_DATA }}"
     state: directory
     mode: 0750
-    owner: node
-    group: node
+    owner: vagrant
+    group: vagrant
 
 - name: Ensure directory for wikijs postgres data
   become: true
