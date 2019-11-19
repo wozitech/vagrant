@@ -18,26 +18,51 @@
     state: restarted
   when: wiki_port_firewalld.changed
 
-# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
-- name: Install wikijs service
+- name: Login to the nexus docker repo
   become: true
-  template:
-      src: ../templates/wiki-cms.docker.service.j2
-      dest: /usr/lib/systemd/system/wozitech-cms.service
-      owner: root
-      group: root
-      mode: 0644
-  vars:
-    wiki_srv:
-      name: "{{  WIKI_CONTAINER_NAME }}"
-  register: wiki_service_install
+  docker_login:
+    registry: "http://{{ wozitech-nexus-proxy }}"
+    username: "{{ NEXUS_USERNAME }}"
+    password: "{{ NEXUS_USERNAME }}"
 
-- name: Enable and start wikijs docker service
-  become: true
-  systemd:
-    name: "{{ WIKI_CONTAINER_NAME }}"
-    state: started
-    enabled: true
-    daemon_reload: yes
-  when: wiki_service_install.changed
+- name: Tag and push to docker hub
+  docker_image:
+    name: "{{ wozitech-nexus-proxy }}/{{ WIKI_DOCKER_IMAGE }}"
+    tag: latest
+
+# - name: create the wikijs container
+#   become: true
+#   docker_container:
+#     name: "{{ WIKI_CONTAINER_NAME }}"
+#     image: "{{ WIKI_DOCKER_IMAGE }}"
+#     state: started
+#     detach: yes
+#     volumes:
+#       #- "{{ SSL_CERTS_DIR }}:/etc/nginx/certs"
+#     ports:
+#       - "8081:{{ CMS_PORT }}/tcp"
+
+
+# # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
+# - name: Install wikijs service
+#   become: true
+#   template:
+#       src: ../templates/wiki-cms.docker.service.j2
+#       dest: /usr/lib/systemd/system/wozitech-cms.service
+#       owner: root
+#       group: root
+#       mode: 0644
+#   vars:
+#     wiki_srv:
+#       name: "{{  WIKI_CONTAINER_NAME }}"
+#   register: wiki_service_install
+
+# - name: Enable and start wikijs docker service
+#   become: true
+#   systemd:
+#     name: "{{ WIKI_CONTAINER_NAME }}"
+#     state: started
+#     enabled: true
+#     daemon_reload: yes
+#   when: wiki_service_install.changed
   
