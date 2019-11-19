@@ -43,7 +43,7 @@
     ports:
       - "8081:{{ CMS_PORT }}/tcp"
     env:
-        DB_TYPE: sqllite
+        DB_TYPE: sqlite
 
 # # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
 # - name: Install wikijs service
