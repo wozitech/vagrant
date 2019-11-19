@@ -21,13 +21,14 @@
 - name: Login to the nexus docker repo
   become: true
   docker_login:
-    registry: "http://{{ wozitech-nexus-proxy }}"
+    registry: "http://{{ wozitech_nexus_proxy }}"
     username: "{{ NEXUS_USERNAME }}"
-    password: "{{ NEXUS_USERNAME }}"
+    password: "{{ NEXUS_PASSWORD }}"
 
-- name: Tag and push to docker hub
+- name: Pull the wiki docker image
+  become: true
   docker_image:
-    name: "{{ wozitech-nexus-proxy }}/{{ WIKI_DOCKER_IMAGE }}"
+    name: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
     tag: latest
 
 # - name: create the wikijs container
