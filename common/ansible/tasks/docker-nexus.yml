@@ -1,0 +1,18 @@
+# docker nexus
+#  - when using nexus for docker images on KMS, go direct not via proxy
+#    which requires used non-secure repositories
+---
+- name: copy repo definition
+  become: true
+  copy: src="../files/{{ item }}"  dest="/etc/docker"  mode="0600"
+  with_items:
+    - daemon.json
+  register: docker_insecure_daemon
+
+- name: Restart docker service
+  become: true
+  systemd:
+    name: docker
+    state: restarted
+  when:
+    - docker_insecure_daemon.changed

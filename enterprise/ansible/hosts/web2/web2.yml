@@ -1,0 +1,35 @@
+---
+- hosts: all
+  vars_files:
+    - ../../../../common/ansible/vars/centosVars.yml
+    - ../../vars.yml
+
+  vars:
+    wiki_external_url: "https://{{ wiki_external_domain }}"
+    WIKI_PORT: 3000
+    WIKI_DOCKER_IMAGE: requarks/wiki:beta
+    WIKI_POSTGRES_DOCKER_IMAGE: postgres:9-alpine
+    WIKI_CONTAINER_NAME: wikijs
+    WIKI_POSTGRES_CONTAINER_NAME: wikijspostgres
+    WIKI_LOCAL_DATA: /var/wikijs/data
+    WIKI_LOCAL_POSTGRES_DATA: /var/wikijs/postgresdata
+    CMS_PORT: 1337
+    CMS_DOCKER_IMAGE: wozitech-cms
+    CMS_CONTAINER_NAME: wozitech-cms
+    CMS_CONTAINER_DB_NAME: wozitech-cms
+    CMS_CONTAINER_DB_USERNAME: wozitech-cms
+    CMS_CONTAINER_DB_PORT: 27017
+    CMS_CONTAINER_DB_SRV: "true"
+    CMS_CONTAINER_DB_SSL: "true"
+
+
+  pre_tasks:
+    #- import_tasks: ../../../../common/ansible/tasks/python.yml
+    #- import_tasks: tasks/network.yml
+    #- import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    #- import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+    #- import_tasks: ../../../../common/ansible/tasks/docker-nexus.yml
+
+  tasks:
+    #- import_tasks: tasks/wikijs.yml
+    - import_tasks: tasks/wozitech-cms.yml

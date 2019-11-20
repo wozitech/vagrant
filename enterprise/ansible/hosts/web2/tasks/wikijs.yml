@@ -1,0 +1,121 @@
+# wikiks
+#
+# Host dependencies for wiki.js V2 container - e.g. docker volumes, host presented config files et al.
+---
+- name: Enable wiki inbound on public zone
+  become: true
+  firewalld:
+    state: enabled
+    zone: public
+    port: "{{ wiki_proxy_target_port }}/tcp"
+    permanent: yes
+  register: wiki_port_firewalld
+
+- name: Restart firewall for changes to take effect
+  become: true
+  systemd:
+    name: firewalld
+    state: restarted
+  when: wiki_port_firewalld.changed
+
+# the wikijs docker image runs under a 'node' user:group with UID/GID of 1000
+#  but 1000 is already used by vagrant on the host
+- name: Ensure directory for wikijs data
+  become: true
+  file:
+    path: "{{ WIKI_LOCAL_DATA }}"
+    state: directory
+    mode: 0777
+    owner: vagrant
+    group: vagrant
+
+- name: Ensure directory for wikijs postgres data
+  become: true
+  file:
+    path: "{{ WIKI_LOCAL_POSTGRES_DATA }}"
+    state: directory
+    mode: 0777
+    owner: root
+    group: root
+
+
+- name: Login to the nexus docker proxy repo
+  become: true
+  docker_login:
+    registry: "http://{{ wozitech_nexus_proxy }}"
+    username: "{{ NEXUS_USERNAME }}"
+    password: "{{ NEXUS_PASSWORD }}"
+
+- name: Pull the wiki docker image
+  become: true
+  docker_image:
+    name: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
+
+- name: Pull the wiki's postgres docker image
+  become: true
+  docker_image:
+    name: "{{ wozitech_nexus_proxy }}/{{ WIKI_POSTGRES_DOCKER_IMAGE }}"
+    tag: latest
+
+
+# note - the postgres container has no exposed port mapping, thus is not available
+#        outside of docker, and thus the username/password for the wiki schema is not sensitive
+#        and hence included here
+- name: create the postgres container
+  become: true
+  docker_container:
+    name: "{{ WIKI_POSTGRES_CONTAINER_NAME }}"
+    image: "{{ wozitech_nexus_proxy }}/{{ WIKI_POSTGRES_DOCKER_IMAGE }}"
+    state: started
+    detach: yes
+    volumes:
+      - "{{ WIKI_LOCAL_POSTGRES_DATA }}:/var/lib/postgresql/data"
+    env:
+        POSTGRES_DB: wiki
+        POSTGRES_PASSWORD: wikijsrocks
+        POSTGRES_USER: wikijs
+
+- name: create the wikijs container
+  become: true
+  docker_container:
+    name: "{{ WIKI_CONTAINER_NAME }}"
+    image: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
+    state: started
+    detach: yes
+    links:
+      - "{{ WIKI_POSTGRES_CONTAINER_NAME }}:db"
+    volumes:
+      - "{{ WIKI_LOCAL_DATA }}:/wiki/data"
+    ports:
+      - "{{ wiki_proxy_target_port }}:{{ WIKI_PORT }}/tcp"
+    env:
+        DB_TYPE: postgres
+        DB_HOST: db
+        DB_PORT: 5432
+        DB_USER: wikijs
+        DB_PASS: wikijsrocks
+        DB_NAME: wiki
+
+# # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
+# - name: Install wikijs service
+#   become: true
+#   template:
+#       src: ../templates/wiki-cms.docker.service.j2
+#       dest: /usr/lib/systemd/system/wozitech-cms.service
+#       owner: root
+#       group: root
+#       mode: 0644
+#   vars:
+#     wiki_srv:
+#       name: "{{  WIKI_CONTAINER_NAME }}"
+#   register: wiki_service_install
+
+# - name: Enable and start wikijs docker service
+#   become: true
+#   systemd:
+#     name: "{{ WIKI_CONTAINER_NAME }}"
+#     state: started
+#     enabled: true
+#     daemon_reload: yes
+#   when: wiki_service_install.changed
+  

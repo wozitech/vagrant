@@ -1,0 +1,11 @@
+[Unit]
+Description=WOZiTech CMS container service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker start -a {{ cms_srv.name }}
+ExecStop=/usr/bin/docker stop -t 2 {{ cms_srv.name }}
+
+[Install]
+WantedBy=local.target

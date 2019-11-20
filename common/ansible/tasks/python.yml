@@ -1,0 +1,16 @@
+# install python - needed to ansible to work
+---
+- name: Check for Python
+  raw: test -e /usr/bin/python
+  changed_when: false
+  failed_when: false
+  register: check_python
+
+- name: Install Python2
+  become: true
+  raw: dnf -y install python2 libselinux-python
+  when: check_python.rc != 0
+
+- name: Set Python2 as default
+  become: true
+  raw: alternatives --set python /usr/bin/python2
