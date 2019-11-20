@@ -16,6 +16,12 @@
     CMS_PORT: 1337
     CMS_DOCKER_IMAGE: wozitech-cms
     CMS_CONTAINER_NAME: wozitech-cms
+    CMS_CONTAINER_DB_NAME: wozitech-cms
+    CMS_CONTAINER_DB_USERNAME: wozitech-cms
+    CMS_CONTAINER_DB_PORT: 27017
+    CMS_CONTAINER_DB_SRV: "true"
+    CMS_CONTAINER_DB_SSL: "true"
+
 
   pre_tasks:
     #- import_tasks: ../../../../common/ansible/tasks/python.yml
@@ -25,5 +31,5 @@
     #- import_tasks: ../../../../common/ansible/tasks/docker-nexus.yml
 
   tasks:
-    - import_tasks: tasks/wikijs.yml
-    #- import_tasks: tasks/wozitech-cms.yml
+    #- import_tasks: tasks/wikijs.yml
+    - import_tasks: tasks/wozitech-cms.yml

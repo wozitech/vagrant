@@ -16,6 +16,39 @@
     state: restarted
   when: cms_port_firewalld.changed
 
+- name: Login to the nexus docker hosted repo
+  become: true
+  docker_login:
+    registry: "http://{{ wozitech_nexus_proxy }}"
+    username: "{{ NEXUS_USERNAME }}"
+    password: "{{ NEXUS_PASSWORD }}"
+
+- name: Pull the CMS docker image
+  become: true
+  docker_image:
+    name: "{{ wozitech_nexus_hosted }}/{{ CMS_DOCKER_IMAGE }}"
+    tag: latest
+
+- name: create the CMS container
+  become: true
+  docker_container:
+    name: "{{ CMS_CONTAINER_NAME }}"
+    image: "{{ wozitech_nexus_hosted }}/{{ CMS_DOCKER_IMAGE }}"
+    state: started
+    detach: yes
+    volumes:
+      #- "{{ WIKI_LOCAL_DATA }}:/wiki/data"
+    ports:
+      - "8081:{{ WIKI_PORT }}/tcp"
+    env:
+        DATABASE_HOST: "{{ CMS_DB_HOST }}"
+        DATABASE_PORT: "{{ CMS_CONTAINER_DB_PORT }}"
+        DATABASE_PASSWORD: "{{ CMS_DB_PASSWORD }}"
+        DATABASE_NAME: "{{ CMS_CONTAINER_DB_NAME }}"
+        DATABASE_SRV: "{{ CMS_CONTAINER_DB_SRV }}"
+        DATABASE_SSL: "{{ CMS_CONTAINER_DB_SSL }}"
+        DATABASE_USERNAME: "{{ CMS_CONTAINER_DB_USERNAME }}"
+
 # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/using_systemd_with_containers
 - name: Install CMS service
   become: true
@@ -38,3 +71,6 @@
     enabled: true
     daemon_reload: yes
   when: cms_service_install.changed
+
+
+# TODO: Update the Atlas DB IP whitelist via API for when DDNS IP changes: https://docs.atlas.mongodb.com/reference/api/whitelist-add-one/
