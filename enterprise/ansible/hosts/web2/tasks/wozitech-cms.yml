@@ -28,6 +28,10 @@
   docker_image:
     name: "{{ wozitech_nexus_hosted }}/{{ CMS_DOCKER_IMAGE }}"
 
+# TODO:
+#  create a host based volume for the public pages (to be styled the same as WOZiTech)
+#  mount it against the container's /usr/src/app/public directory
+
 - name: create the CMS container
   become: true
   docker_container:
