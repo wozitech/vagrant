@@ -27,7 +27,6 @@
   become: true
   docker_image:
     name: "{{ wozitech_nexus_hosted }}/{{ CMS_DOCKER_IMAGE }}"
-    tag: latest
 
 - name: create the CMS container
   become: true
