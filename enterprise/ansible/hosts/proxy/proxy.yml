@@ -36,9 +36,9 @@
     NGINX_PROXY_DEFAULT_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_DEFAULT }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
-    REMOTE_WIKI2_URI: "http://{{ webserver2_ip }}:8081"
+    REMOTE_WIKI2_URI: "http://{{ webserver2_ip }}:{{ wiki_proxy_target_port }}"
     REMOTE_NEXUS_URI: "http://{{ nexus_ip }}:8081"
-    REMOTE_CMS_URI: "http://{{ webserver2_ip }}:8080"
+    REMOTE_CMS_URI: "http://{{ webserver2_ip }}:{{ cms_proxy_target_port }}"
     LETENCYRPT_ADMIN_EMAIL: admin@wozitech-ltd.co.uk
     dnsmasq_domain: "{{ root_domain }}"
     dnsmasq_listen_address: "{{ forward_proxy_ip }}"

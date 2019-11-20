@@ -29,3 +29,5 @@ default_external_domain: wozitech.myddns.rocks
 
 wozitech_nexus_proxy: 10.0.0.32:9081
 wozitech_nexus_hosted: 10.0.0.32:9080
+wiki_proxy_target_port: 8081
+cms_proxy_target_port: 8080

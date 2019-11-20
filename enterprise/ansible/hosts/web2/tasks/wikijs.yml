@@ -7,7 +7,7 @@
   firewalld:
     state: enabled
     zone: public
-    port: "{{ WIKI_PORT }}/tcp"
+    port: "{{ wiki_proxy_target_port }}/tcp"
     permanent: yes
   register: wiki_port_firewalld
 
@@ -50,7 +50,6 @@
   become: true
   docker_image:
     name: "{{ wozitech_nexus_proxy }}/{{ WIKI_DOCKER_IMAGE }}"
-    tag: latest
 
 - name: Pull the wiki's postgres docker image
   become: true
@@ -88,7 +87,7 @@
     volumes:
       - "{{ WIKI_LOCAL_DATA }}:/wiki/data"
     ports:
-      - "8081:{{ WIKI_PORT }}/tcp"
+      - "{{ wiki_proxy_target_port }}:{{ WIKI_PORT }}/tcp"
     env:
         DB_TYPE: postgres
         DB_HOST: db
