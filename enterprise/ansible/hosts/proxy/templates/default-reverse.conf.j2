@@ -49,6 +49,7 @@ server {
       proxy_headers_hash_bucket_size 128;
 
       root /usr/share/nginx/html/wozitech;
+      index local.html
 
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
