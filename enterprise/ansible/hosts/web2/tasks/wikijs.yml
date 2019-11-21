@@ -101,7 +101,7 @@
   become: true
   template:
       src: ../templates/wozitech-wikijs.docker.service.j2
-      dest: /usr/lib/systemd/system/wiki.service
+      dest: /usr/lib/systemd/system/wikijs.service
       owner: root
       group: root
       mode: 0644
@@ -113,7 +113,7 @@
 - name: Enable and start wikijs docker service
   become: true
   systemd:
-    name: "{{ WIKI_CONTAINER_NAME }}"
+    name: wikijs
     state: started
     enabled: true
     daemon_reload: yes
