@@ -19,15 +19,6 @@
     owner: root
     group: root
 
-- name: Ensure directory for local html exists
-  become: true
-  file:
-    path: "{{ HTML_DIR }}"
-    state: directory
-    mode: 0755
-    owner: root
-    group: root
-
 - name: Ensure directory for local conf exists
   become: true
   file:
@@ -46,23 +37,6 @@
     owner: root
     group: root
 
-# - name: Copy top level HTML placeholders
-#   become: true
-#   copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
-#   with_items:
-#     - index.html
-#     - 50x.html
-#   changed_when: false
-
-- name: Install git packages
-  become: true
-  yum:
-    name: "{{ item.name }}"
-    state: "{{ item.state }}"
-  with_items:
-    - { name: git, state: present }
-  when:
-    - ansible_pkg_mgr == "yum"
 
 - name: clone/pull the HTML files from https://github.com/wozitech/wozitech.git
   become: true

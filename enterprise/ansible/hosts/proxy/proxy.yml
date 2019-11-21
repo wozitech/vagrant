@@ -57,6 +57,7 @@
   #   - import_tasks: tasks/dns.yml
   #   - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
   #   - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+  #   - import_tasks: tasks/git.yml
 
   # roles:
   #   - { role: bertvv.dnsmasq, become: yes }

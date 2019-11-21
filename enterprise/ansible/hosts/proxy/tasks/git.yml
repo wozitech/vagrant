@@ -1,0 +1,11 @@
+# common tasks
+---
+- name: Install git packages
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: git, state: present }
+  when:
+    - ansible_pkg_mgr == "yum"
