@@ -101,7 +101,7 @@
   become: true
   template:
       src: ../templates/wiki-cms.docker.service.j2
-      dest: /usr/lib/systemd/system/wozitech-cms.service
+      dest: /usr/lib/systemd/system/wiki.service
       owner: root
       group: root
       mode: 0644
