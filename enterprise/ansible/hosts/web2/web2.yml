@@ -31,5 +31,5 @@
     #- import_tasks: ../../../../common/ansible/tasks/docker-nexus.yml
 
   tasks:
-    #- import_tasks: tasks/wikijs.yml
+    - import_tasks: tasks/wikijs.yml
     - import_tasks: tasks/wozitech-cms.yml
