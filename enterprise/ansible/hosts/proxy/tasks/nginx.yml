@@ -47,6 +47,7 @@
     update: yes
 
 - name: rename local.html - to index.html
+  become: true
   copy:
     remote_src: yes
     src: "{{ HTML_DIR }}/local.html"
