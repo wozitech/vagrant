@@ -54,6 +54,16 @@
 #     - 50x.html
 #   changed_when: false
 
+- name: Install git packages
+  become: true
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state }}"
+  with_items:
+    - { name: git, state: present }
+  when:
+    - ansible_pkg_mgr == "yum"
+
 - name: clone/pull the HTML files from https://github.com/wozitech/wozitech.git
   become: true
   git:
