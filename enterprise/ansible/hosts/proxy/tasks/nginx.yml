@@ -47,7 +47,10 @@
     update: yes
 
 - name: rename local.html - to index.html
-  copy: remote_src=True src="{{ HTML_DIR }}/local.html" dest="{{ HTML_DIR }}/index.html"
+  file:
+    src: "{{ HTML_DIR }}/local.html"
+    path: "{{ HTML_DIR }}/index.html"
+    state: hard
 
 - name: Copy nginx conf
   become: true
