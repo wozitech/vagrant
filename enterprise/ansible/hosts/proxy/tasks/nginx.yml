@@ -45,6 +45,7 @@
     dest: "{{ HTML_DIR }}"
     clone: yes
     update: yes
+    force: yes
 
 - name: rename local.html - to index.html
   become: true
