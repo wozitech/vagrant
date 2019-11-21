@@ -46,13 +46,24 @@
     owner: root
     group: root
 
-- name: Copy top level HTML placeholders
+# - name: Copy top level HTML placeholders
+#   become: true
+#   copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
+#   with_items:
+#     - index.html
+#     - 50x.html
+#   changed_when: false
+
+- name: clone/pull the HTML files from https://github.com/wozitech/wozitech.git
   become: true
-  copy: src="../files/html/{{ item }}"  dest="{{ HTML_DIR }}"  mode=0644
-  with_items:
-    - index.html
-    - 50x.html
-  changed_when: false
+  git:
+    repo: 'https://github.com/wozitech/wozitech.git'
+    dest: "{{ HTML_DIR }}"
+    clone: yes
+    update: yes
+
+- name: rename local.html - to index.html
+  copy: remote_src=True src="{{ HTML_DIR }}/local.html" dest="{{ HTML_DIR }}/index.html"
 
 - name: Copy nginx conf
   become: true
