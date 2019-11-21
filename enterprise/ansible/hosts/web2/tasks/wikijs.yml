@@ -100,7 +100,7 @@
 - name: Install wikijs service
   become: true
   template:
-      src: ../templates/wiki-cms.docker.service.j2
+      src: ../templates/wozitech-wikijs.docker.service.j2
       dest: /usr/lib/systemd/system/wiki.service
       owner: root
       group: root
