@@ -7,3 +7,23 @@
     executable: /bin/bash
     creates: /usr/local/bin/kustomize_install.log
   changed_when: false
+
+
+- name: Download Helm 
+  get_url:
+    url: https://get.helm.sh/helm-v3.1.0-rc.1-linux-amd64.tar.gz
+    dest: /tmp/helm-v3.1.0-rc.1-linux-amd64.tar.gz
+    mode: '0440'
+- name: Unarchive Helm
+  unarchive:
+    src: /tmp/helm-v3.1.0-rc.1-linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
+- name: Copy unpacked helm executable
+  become: true
+  copy: remote_src=True src=/tmp/linux-amd64/helm dest=/usr/local/bin mode='0755'
+
+- name: Remove download archive
+  file: path=/tmp/helm-v3.1.0-rc.1-linux-amd64.tar.gz state=absent
+- name: Remove unpacked files
+  file: path=/tmp/linux-amd64 state=absent
