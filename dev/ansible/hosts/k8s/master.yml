@@ -9,12 +9,12 @@
     DISABLE_HOST_FIREWALL: true       # this is because firewall interfers with docker
 
   pre_tasks:
-    - import_tasks: tasks/network.yml
-      vars:
-        host_ip: "{{ k8smaster_ip }}"
-        host_fqdn: "{{ k8smaster_fqdn}}"
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
-    - import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
+    #- import_tasks: tasks/network.yml
+    #  vars:
+    #    host_ip: "{{ k8smaster_ip }}"
+    #    host_fqdn: "{{ k8smaster_fqdn}}"
+    #- import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    #- import_tasks: ../../../../common/ansible/tasks/docker_prep.yml
 
   roles:
   tasks:
@@ -46,4 +46,4 @@
           gateway: "{{ network_gw }}"
           dns: "{{ local_dns }}"
           netmask: "{{ netmask }}"
-    - import_tasks: tasks/k8s-master-tools.yaml
+    - import_tasks: tasks/k8s-master-tools.yml
