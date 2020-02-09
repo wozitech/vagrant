@@ -1,0 +1,9 @@
+# kubernetes cluster (k8s) - master tools - e.g. helm and kustomize
+---
+- name: Install kustomize
+  become: true
+  shell: curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash > /usr/local/bin/kustomize.install.log
+  args:
+    executable: /bin/bash
+    creates: /usr/local/bin/kustomize.install.log
+  changed_when: false

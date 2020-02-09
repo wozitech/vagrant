@@ -26,13 +26,24 @@
     #      - { name: "{{ k8sworker2_hostname }}", ip: "{{ k8sworker2_ip }}", domain: "dev.{{ root_domain}}" }
     #    this_host_ip: "{{ k8smaster_ip }}"
     #- import_tasks: tasks/k8s-master.yml
-    - name: Setup local network (eth2) - for binding the kubernetes cockpit admin UI
+    # - name: Setup local network (eth2) - for binding the kubernetes dashboard admin UI
+    #   become: true
+    #   template: src=../../../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth2
+    #   vars:
+    #     ipinterface:
+    #       ifname: eth2
+    #       ip: "{{ k8s_cockpit_ip }}"
+    #       gateway: "{{ network_gw }}"
+    #       dns: "{{ local_dns }}"
+    #       netmask: "{{ netmask }}"
+    - name: Setup local network (eth3) - for binding the Kong Ingress Controller
       become: true
-      template: src=../../../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth2
+      template: src=../../../../common/ansible/templates/ifcfg.j2 dest=/etc/sysconfig/network-scripts/ifcfg-eth3
       vars:
         ipinterface:
-          ifname: eth2
-          ip: "{{ k8s_cockpit_ip }}"
+          ifname: eth3
+          ip: "{{ k8s_ingress_ip }}"
           gateway: "{{ network_gw }}"
           dns: "{{ local_dns }}"
           netmask: "{{ netmask }}"
+    - import_tasks: tasks/k8s-master-tools.yaml
