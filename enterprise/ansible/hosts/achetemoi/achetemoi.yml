@@ -6,12 +6,16 @@
 
   vars:
     external_url: "https://{{ wiki_external_domain }}"
-    PORT: 3000
+    ACHETE_PORT: 8080
+    ACHETE_LOCAL_DATA: /var/www/achete
+    host_os_packages:
+      - { name:  java-1.8.0-openjdk, state: present }
+      - { name: postgresql, state: present }
   
   pre_tasks:
     # - import_tasks: ../../../../common/ansible/tasks/python.yml
-    - import_tasks: tasks/network.yml
-    - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
+    # - import_tasks: tasks/network.yml
+    # - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
   
   tasks:
-    # - import_tasks: tasks/achetemoi.yml
+    - import_tasks: tasks/achetemoi.yml
