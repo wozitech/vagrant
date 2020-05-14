@@ -93,6 +93,11 @@
   template: src="../templates/cms-reverse.conf.j2"  dest="{{ NGINX_PROXY_CMS_CONF_FILE }}"  mode=0644
   register: cms_reverse_proxy
 
+- name: Generate Achete Moi reverse proxy conf
+  become: true
+  template: src="../templates/achetemoi-reverse.conf.j2"  dest="{{ NGINX_PROXY_ACHETE_CONF_FILE }}"  mode=0644
+  register: achetemoi_reverse_proxy
+
 - name: Generate default reverse proxy conf
   become: true
   template: src="../templates/default-reverse.conf.j2"  dest="{{ NGINX_PROXY_DEFAULT_CONF_FILE }}"  mode=0644
@@ -210,5 +215,6 @@
     - nexus_reverse_proxy.changed
     - wiki2_reverse_proxy.changed
     - cms_reverse_proxy.changed
+    - achetemoi_reverse_proxy.changed
     - default_reverse_proxy.changed
     - not nginx_service_install.changed

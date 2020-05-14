@@ -24,21 +24,25 @@
     LETSENCRYPT_WIKI_CONTAINER_NAME: wikiletsencrypt
     LETSENCRYPT_NEXUS_CONTAINER_NAME: nexusletsencrypt
     LETSENCRYPT_CMS_CONTAINER_NAME: cmsletsencrypt
+    LETSENCRYPT_ACHETE_CONTAINER_NAME: acheteletsencrypt
     VIRTUAL_HOST_WIKI: "{{ wiki_external_domain }}"
     VIRTUAL_HOST_WIKI_TWO: "{{ wikitwo_external_domain }}"
     VIRTUAL_HOST_NEXUS: "{{ nexus_external_domain }}"
     VIRTUAL_HOST_CMS: "{{ cms_external_domain }}"
     VIRTUAL_HOST_DEFAULT: "{{ default_external_domain }}"
+    VIRTUAL_HOST_ACHETE: "{{ achetemoi_external_domain }}"
     NGINX_PROXY_WIKI_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI }}.conf"
     NGINX_PROXY_NEXUS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_NEXUS }}.conf"
     NGINX_PROXY_WIKI2_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_WIKI_TWO }}.conf"
     NGINX_PROXY_CMS_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_CMS }}.conf"
+    NGINX_PROXY_ACHETE_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_ACHETE }}.conf"
     NGINX_PROXY_DEFAULT_CONF_FILE: "{{ VHOSTS_CONF_DIR }}/{{ VIRTUAL_HOST_DEFAULT }}.conf"
     DHPARAM_FILE: "{{ SSL_CERTS_DIR }}/dhparam.pem"
     REMOTE_WIKI_URI: "http://{{ webserver_ip }}:3000"
     REMOTE_WIKI2_URI: "http://{{ webserver2_ip }}:{{ wiki_proxy_target_port }}"
     REMOTE_NEXUS_URI: "http://{{ nexus_ip }}:8081"
     REMOTE_CMS_URI: "http://{{ webserver2_ip }}:{{ cms_proxy_target_port }}"
+    REMOTE_ACHETE_URI: "http://{{ achetemoi_ip }}:{{ achete_proxy_target_port }}"
     LETENCYRPT_ADMIN_EMAIL: admin@wozitech-ltd.co.uk
     dnsmasq_domain: "{{ root_domain }}"
     dnsmasq_listen_address: "{{ forward_proxy_ip }}"
@@ -69,4 +73,5 @@
     #- import_tasks: tasks/letsencrypt-nexus.yml
     #- import_tasks: tasks/letsencrypt-cms.yml
     #- import_tasks: tasks/letsencrypt-default.yml
+    - import_tasks: tasks/letsencrypt-achetemoi.yml
 
