@@ -4,6 +4,8 @@
 # wit home Enterprise virtual (KVM) servers:
 # 1. Proxy (forward and reverse)
 # 2. Extranet web server (wiki)
+# 3. Nexus
+# 4. Achete Moi - app server (consumes postgresdb on dev LAN)
 
 Vagrant.configure("2") do |config|
    
@@ -108,6 +110,24 @@ Vagrant.configure("2") do |config|
     end
 
     vault.vm.post_up_message = "The Hashicorp Vault server is up and running"
+  end
+
+  config.vm.define :achetemoi do |web2|
+    achetemoi.vm.hostname = "achetemoi.wozitech.local"
+    achetemoi.vm.network :private_network,
+      libvirt__network_name: "DMZ"
+
+    achetemoi.vm.provider :libvirt do |domain|
+      domain.memory = 8192
+    end
+
+    achetemoi.vm.provision "ansible" do |ansible|
+       ansible.playbook = "ansible/hosts/achetemoi/achetemoi.yml"
+       ansible.compatibility_mode = "2.0"
+       ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
+    end
+
+    achetemoi.vm.post_up_message = "The Acheme Moi app server is up and running"
   end
 
 end

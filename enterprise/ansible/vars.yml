@@ -6,17 +6,20 @@ forward_proxy_ip: "10.0.0.10"
 reverse_proxy_ip: "10.0.0.12"
 vault_ip: "10.0.0.31"
 nexus_ip: "10.0.0.32"
+achetemoi_ip: "10.0.0.40"
 root_domain: "wozitech-ltd.local"
 proxy_hostname: "proxy"
 webserver_hostname: "web1"
 webserver2_hostname: "web2"
 vault_hostname: "vault"
 nexus_hostname: "nexus"
+achetemoi_hostname: "achetemoi"
 proxy_fqdn: "{{ proxy_hostname }}.{{ root_domain}}"
 webserver_fqdn: "{{ webserver_hostname }}.{{ root_domain}}"
 webserver2_fqdn: "{{ webserver2_hostname }}.{{ root_domain}}"
 vault_fqdn: "{{ vault_hostname }}.{{ root_domain}}"
 nexus_fqdn: "{{ nexus_hostname }}.{{ root_domain}}"
+achetemoi_fqdn: "{{ achetemoi_hostname }}.{{ root_domain}}"
 
 root_dns: "192.168.1.1"
 local_dns: "{{ forward_proxy_ip }}"
@@ -26,6 +29,7 @@ wikitwo_external_domain: wiki.wozitech.myddns.rocks
 nexus_external_domain: nexus.wozitech.myddns.rocks
 cms_external_domain: cms.wozitech.myddns.rocks
 default_external_domain: wozitech.myddns.rocks
+achetemoi_external_domain: achetemoi.wozitech.myddns.rocks
 
 wozitech_nexus_proxy: 10.0.0.32:9081
 wozitech_nexus_hosted: 10.0.0.32:9080
