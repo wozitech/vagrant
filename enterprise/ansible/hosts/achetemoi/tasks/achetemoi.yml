@@ -35,4 +35,24 @@
     owner: vagrant
     group: vagrant
 
+- name: Install achete moi service
+  become: true
+  template:
+      src: ../templates/achetemoi.service.j2
+      dest: /usr/lib/systemd/system/achetemoi.service
+      owner: root
+      group: root
+      mode: 0644
+  register: achetemoi_service_install
+
+- name: Enable and start achetemoi service
+  become: true
+  systemd:
+    name: achetemoi
+    state: started
+    enabled: true
+    daemon_reload: yes
+  when: achetemoi_service_install.changed
+  
+
 ## NOTE - no automating the tasks to install the app and start the app - not yet at least. 

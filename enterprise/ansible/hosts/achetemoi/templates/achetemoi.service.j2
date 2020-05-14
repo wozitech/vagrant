@@ -1,0 +1,12 @@
+[Unit]
+Description=Acheme Moi Java spring boot service
+After=syslog.target
+
+[Service]
+User=vagrant
+Restart=always
+ExecStart=SPRING_PROFILES_ACTIVE=wozitech-local S3_DOC_BUCKET=achete-moi-docs-dev S3_ASSETS_BUCKET=achete-moi-assets-dev JASYPT_ENCRYPTOR_PASSWORD="${JASYPT_ENV_KEY}" /usr/bin/java -jar achete-www-boot.jar
+SuccessExitStatus=143
+
+[Install]
+WantedBy=local.target
