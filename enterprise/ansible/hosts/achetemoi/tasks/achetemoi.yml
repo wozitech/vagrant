@@ -34,3 +34,5 @@
     mode: 0777
     owner: vagrant
     group: vagrant
+
+## NOTE - no automating the tasks to install the app and start the app - not yet at least. 
