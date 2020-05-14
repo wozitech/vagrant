@@ -112,7 +112,7 @@ Vagrant.configure("2") do |config|
     vault.vm.post_up_message = "The Hashicorp Vault server is up and running"
   end
 
-  config.vm.define :achetemoi do |web2|
+  config.vm.define :achetemoi do |achetemoi|
     achetemoi.vm.hostname = "achetemoi.wozitech.local"
     achetemoi.vm.network :private_network,
       libvirt__network_name: "DMZ"

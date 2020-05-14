@@ -9,7 +9,7 @@
     PORT: 3000
   
   pre_tasks:
-    - import_tasks: ../../../../common/ansible/tasks/python.yml
+    # - import_tasks: ../../../../common/ansible/tasks/python.yml
     - import_tasks: tasks/network.yml
     - import_tasks: ../../../../common/ansible/tasks/centosTasks.yml
   
